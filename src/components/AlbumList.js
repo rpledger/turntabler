@@ -61,15 +61,19 @@ export default function SimpleList() {
   return (
     <div className={classes.root}>
       <List component="nav" aria-label="main mailbox folders">
+      <ListItem>
+        <ListItemText primary="A"/>
+      </ListItem>
+      <Divider component="li" />
       {tileData.map(tile => (
         <div>
           <ListItem button>
             <ListItemAvatar>
-              <Avatar variant="square" className={classes.bigAvatar} alt="Remy Sharp" src="https://img.discogs.com/7XGz7VuFH-dp80PqS_M-BLe7GGA=/fit-in/300x300/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-1963341-1262735484.jpeg.jpg" />
+              <Avatar variant="square" className={classes.bigAvatar} alt="Remy Sharp" src={tile.img} />
             </ListItemAvatar>
-            <ListItemText primary="Emotionalism" secondary="Avett Brothers"/>
+            <ListItemText primary={tile.title} secondary={tile.artist}/>
           </ListItem>
-          <Divider variant="inset" component="li" />
+          <Divider component="li" />
         </div>
       ))}
       </List>
