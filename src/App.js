@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
-import Dashboard from './components/Dashboard';
+import AlbumList from './components/AlbumList';
 
 class App extends Component {
   render() {
@@ -16,7 +16,7 @@ class App extends Component {
           <Navbar />
           <Route exact path="/signIn" component={SignIn} />
           <Route path="/signUp" component={SignUp} />
-          <Route path="/" component={Dashboard} />
+          <Route path="/" component={AlbumList} />
         </div>
       </Router>
     );

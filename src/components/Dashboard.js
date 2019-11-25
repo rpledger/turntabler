@@ -48,10 +48,14 @@ const useStyles = makeStyles(theme => ({
 
 function Dashboard() {
   const classes = useStyles();
+   const { classes, currentUser, images, width } = this.props;
+
+  let columns = width === 'xs' || width === 'sm'  ? 1 : 2;
+
 
   return (
     <div className={classes.root}>
-      <GridList spacing={5} cellHeight={200} className={classes.gridList} cols={2}>
+      <GridList spacing={5} cellHeight={200} className={classes.gridList} cols={columns} >
         {tileData.map(tile => (
           <GridListTile key={tile.img}>
             <img src={tile.img} alt={tile.title} />
