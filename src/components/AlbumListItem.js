@@ -105,7 +105,7 @@ export default function AlbumListItem(props) {
             </ListItemAvatar>
             <ListItemText primary={props.title} secondary={props.artist}/>
             <ListItemIcon>
-              <AlbumListItemMenu title={props.title} />
+              <AlbumListItemMenu title={props.title} id={props.key} />
             </ListItemIcon>
           </ListItem>
     </div>

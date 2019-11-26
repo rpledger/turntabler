@@ -65,10 +65,10 @@ export default function ListenNowDialog(props) {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button autoFocus onClick={props.handleClose} color="primary">
+        <Button autoFocus onClick={props.handleCancel} color="primary">
           Cancel
         </Button>
-        <Button onClick={props.handleClose} color="primary">
+        <Button onClick={props.handleListen} color="primary">
           Listen
         </Button>
       </DialogActions>

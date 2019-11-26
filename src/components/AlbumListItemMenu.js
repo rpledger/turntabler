@@ -75,7 +75,12 @@ export default function AlbumListItemMenu(props) {
     setOpenListenNowDialog(true);
   };
 
-  const handleCloseListenNowDialog = () => {
+  const handleCancelListenNowDialog = () => {
+    setOpenListenNowDialog(false);
+    setOpen(false);
+  };
+
+  const handleConfirmListenNowDialog = () => {
     setOpenListenNowDialog(false);
     setOpen(false);
   };
@@ -127,8 +132,10 @@ export default function AlbumListItemMenu(props) {
       </Menu>
       <ListenNowDialog
         title={props.title}
+        id={props.id}
         open={openListenNowDialog}
-        handleClose={handleCloseListenNowDialog}
+        handleCancel={handleCancelListenNowDialog}
+        handleListen={handleConfirmListenNowDialog}
       />
     </div>
   );
