@@ -12,7 +12,7 @@ import InboxIcon from '@material-ui/icons/Inbox';
 import DraftsIcon from '@material-ui/icons/Drafts';
 import MenuIcon from '@material-ui/icons/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import MenuList from '@material-ui/core/MenuItem';
+import MenuList from '@material-ui/core/MenuList';
 import Menu from '@material-ui/core/Menu';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import IconButton from '@material-ui/core/IconButton';
@@ -22,6 +22,9 @@ import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import Grow from '@material-ui/core/Grow';
 import Popper from '@material-ui/core/Popper';
 import ListSubheader from '@material-ui/core/ListSubheader';
+import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
+import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
+import InfoIcon from '@material-ui/icons/Info';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -86,13 +89,6 @@ export default function AlbumListItem(props) {
     setOpen(false);
   };
 
-  function handleListKeyDown(event) {
-    if (event.key === 'Tab') {
-      event.preventDefault();
-      setOpen(false);
-    }
-  }
-
   // return focus to the button when we transitioned from !open -> open
   const prevOpen = React.useRef(open);
   React.useEffect(() => {
@@ -135,9 +131,24 @@ export default function AlbumListItem(props) {
               >
                 <ListSubheader onClick={handleClose}>{props.title}</ListSubheader>
                 <Divider component="li" />
-                <MenuItem onClick={handleClose}>Listen Now</MenuItem>
-                <MenuItem onClick={handleClose}>Add Past Listen</MenuItem>
-                <MenuItem onClick={handleClose}>More Info</MenuItem>
+                <MenuItem onClick={handleClose}>
+                  <ListItemIcon>
+                    <PlayCircleOutlineIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary="Listen Now" />
+                </MenuItem>
+                <MenuItem onClick={handleClose}>
+                  <ListItemIcon>
+                    <CalendarTodayIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary="Add Past Listen" />
+                </MenuItem>
+                <MenuItem onClick={handleClose}>
+                  <ListItemIcon>
+                    <InfoIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary="More Info" />
+                </MenuItem>
               </Menu>
             </ListItemIcon>
           </ListItem>
