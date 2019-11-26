@@ -27,6 +27,7 @@ import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 import InfoIcon from '@material-ui/icons/Info';
 
 import AlbumListItemMenu from './AlbumListItemMenu';
+import ListenNowDialog from './ListenNowDialog';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -72,6 +73,7 @@ var tileData = [
 
 export default function AlbumListItem(props) {
   const classes = useStyles();
+  const [openListenNowDialog, setOpenListenNowDialog] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef(null);
 
@@ -97,6 +99,20 @@ export default function AlbumListItem(props) {
     prevOpen.current = open;
   }, [open]);
 
+  const handleOpenListenNowDialog = () => {
+    setOpenListenNowDialog(true);
+  };
+
+  const handleCancelListenNowDialog = () => {
+    setOpenListenNowDialog(false);
+    setOpen(false);
+  };
+
+  const handleConfirmListenNowDialog = () => {
+    setOpenListenNowDialog(false);
+    setOpen(false);
+  };
+
   return (
     <div className={classes.root}>
           <ListItem>
@@ -105,9 +121,24 @@ export default function AlbumListItem(props) {
             </ListItemAvatar>
             <ListItemText primary={props.title} secondary={props.artist}/>
             <ListItemIcon>
-              <AlbumListItemMenu title={props.title} id={props.key} />
+              <IconButton onClick={handleOpenListenNowDialog}>
+                <PlayCircleOutlineIcon/>
+              </IconButton>
+              <IconButton>
+                <CalendarTodayIcon/>
+              </IconButton>
+              <IconButton>
+                <InfoIcon/>
+              </IconButton>
             </ListItemIcon>
           </ListItem>
+          <ListenNowDialog
+            title={props.title}
+            id={props.id}
+            open={openListenNowDialog}
+            handleCancel={handleCancelListenNowDialog}
+            handleListen={handleConfirmListenNowDialog}
+          />
     </div>
   );
 }
