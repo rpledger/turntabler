@@ -14,6 +14,7 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import Radio from '@material-ui/core/Radio';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 
+import PastListenPicker from './PastListenPicker';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -64,6 +65,7 @@ export default function PastListenDialog(props) {
         <DialogContentText id="alert-dialog-description">
           Add past listen for <b>{props.title}</b> at:
         </DialogContentText>
+        <PastListenPicker />
       </DialogContent>
       <DialogActions>
         <Button autoFocus onClick={props.handleCancel} color="primary">
