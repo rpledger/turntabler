@@ -26,7 +26,7 @@ import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 import InfoIcon from '@material-ui/icons/Info';
 
-
+import ListenNowDialog from './ListenNowDialog';
 
 
 const useStyles = makeStyles(theme => ({
@@ -43,7 +43,7 @@ const useStyles = makeStyles(theme => ({
 
 }));
 
-export default function AlbumListItem(props) {
+export default function AlbumListItemMenu(props) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef(null);
@@ -115,6 +115,7 @@ export default function AlbumListItem(props) {
           <ListItemText primary="More Info" />
         </MenuItem>
       </Menu>
+      <ListenNowDialog title={props.title} />
     </div>
   );
 }
