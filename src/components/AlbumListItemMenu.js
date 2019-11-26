@@ -45,6 +45,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function AlbumListItemMenu(props) {
   const classes = useStyles();
+  const [openListenNowDialog, setOpenListenNowDialog] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef(null);
 
@@ -69,6 +70,15 @@ export default function AlbumListItemMenu(props) {
 
     prevOpen.current = open;
   }, [open]);
+
+  const handleOpenListenNowDialog = () => {
+    setOpenListenNowDialog(true);
+  };
+
+  const handleCloseListenNowDialog = () => {
+    setOpenListenNowDialog(false);
+    setOpen(false);
+  };
 
   return (
     <div className={classes.root}>
@@ -96,7 +106,7 @@ export default function AlbumListItemMenu(props) {
       >
         <ListSubheader onClick={handleClose}>{props.title}</ListSubheader>
         <Divider component="li" />
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={handleOpenListenNowDialog}>
           <ListItemIcon>
             <PlayCircleOutlineIcon fontSize="small" />
           </ListItemIcon>
@@ -115,7 +125,11 @@ export default function AlbumListItemMenu(props) {
           <ListItemText primary="More Info" />
         </MenuItem>
       </Menu>
-      <ListenNowDialog title={props.title} />
+      <ListenNowDialog
+        title={props.title}
+        open={openListenNowDialog}
+        handleClose={handleCloseListenNowDialog}
+      />
     </div>
   );
 }

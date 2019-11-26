@@ -31,7 +31,7 @@ const useStyles = makeStyles(theme => ({
 export default function ListenNowDialog(props) {
   const classes = useStyles();
   const { value: valueProp, ...other } = props;
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(props.openFromMenu);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -51,9 +51,6 @@ export default function ListenNowDialog(props) {
 
   return (
     <div>
-    <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-      Open alert dialog
-    </Button>
     <Dialog
       disableBackdropClick
       disableEscapeKeyDown
@@ -68,10 +65,10 @@ export default function ListenNowDialog(props) {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button autoFocus onClick={handleCancel} color="primary">
+        <Button autoFocus onClick={props.handleClose} color="primary">
           Cancel
         </Button>
-        <Button onClick={handleOk} color="primary">
+        <Button onClick={props.handleClose} color="primary">
           Listen
         </Button>
       </DialogActions>
