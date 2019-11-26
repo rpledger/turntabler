@@ -10,8 +10,11 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Divider from '@material-ui/core/Divider';
 import InboxIcon from '@material-ui/icons/Inbox';
 import DraftsIcon from '@material-ui/icons/Drafts';
-
-import AlbumListItem from './AlbumListItem';
+import MenuIcon from '@material-ui/icons/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import Menu from '@material-ui/core/Menu';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import IconButton from '@material-ui/core/IconButton';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -58,22 +61,40 @@ function ListItemLink(props) {
   return <ListItem button component="a" {...props} />;
 }
 
-export default function SimpleList() {
+export default function SimpleList(props) {
   const classes = useStyles();
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+
+  // function handleChange(event) {
+  //   setAuth(event.target.checked);
+  // }
+
+  function handleMenu(event) {
+    setAnchorEl(event.currentTarget);
+  }
+
+  function handleClose() {
+    setAnchorEl(null);
+  }
 
   return (
     <div className={classes.root}>
-      <List component="nav" aria-label="main mailbox folders">
-      <ListItem>
-        <ListItemText primary="A"/>
-      </ListItem>
       <Divider component="li" />
-      {tileData.map(tile => (
         <div>
-          <AlbumListItem title={tile.title} artist={tile.artist} img={tile.img} />
+          <ListItem>
+            <ListItemAvatar>
+              <Avatar variant="square" className={classes.bigAvatar} alt="Remy Sharp" src={props.img} />
+            </ListItemAvatar>
+            <ListItemText primary={props.title} secondary={props.artist}/>
+            <ListItemIcon>
+              <IconButton>
+                <MoreVertIcon/>
+              </IconButton>
+            </ListItemIcon>
+          </ListItem>
+          <Divider component="li" />
         </div>
-      ))}
-      </List>
     </div>
   );
 }
