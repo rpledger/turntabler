@@ -27,6 +27,7 @@ import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 import InfoIcon from '@material-ui/icons/Info';
 
 import ListenNowDialog from './ListenNowDialog';
+import PastListenDialog from './PastListenDialog';
 
 
 const useStyles = makeStyles(theme => ({
@@ -46,6 +47,7 @@ const useStyles = makeStyles(theme => ({
 export default function AlbumListItemMenu(props) {
   const classes = useStyles();
   const [openListenNowDialog, setOpenListenNowDialog] = React.useState(false);
+  const [openPastDialog, setOpenPastDialog] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef(null);
 
@@ -85,6 +87,19 @@ export default function AlbumListItemMenu(props) {
     setOpen(false);
   };
 
+  const handleOpenPastDialog = () => {
+    console.log("opening..")
+    setOpenPastDialog(true);
+  };
+
+  const handleCancelPastDialog = () => {
+    setOpenPastDialog(false);
+  };
+
+  const handleConfirmPastDialog = () => {
+    setOpenPastDialog(false);
+  };
+
   return (
     <div className={classes.root}>
       <IconButton
@@ -111,13 +126,13 @@ export default function AlbumListItemMenu(props) {
       >
         <ListSubheader onClick={handleClose}>{props.title}</ListSubheader>
         <Divider component="li" />
-        <MenuItem onClick={handleOpenListenNowDialog}>
+        <MenuItem onClick={handleOpenPastDialog}>
           <ListItemIcon>
             <PlayCircleOutlineIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText primary="Listen Now" />
         </MenuItem>
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={handleOpenPastDialog}>
           <ListItemIcon>
             <CalendarTodayIcon fontSize="small" />
           </ListItemIcon>
@@ -130,12 +145,13 @@ export default function AlbumListItemMenu(props) {
           <ListItemText primary="More Info" />
         </MenuItem>
       </Menu>
-      <ListenNowDialog
+
+      <PastListenDialog
         title={props.title}
         id={props.id}
-        open={openListenNowDialog}
-        handleCancel={handleCancelListenNowDialog}
-        handleListen={handleConfirmListenNowDialog}
+        open={openPastDialog}
+        handleCancel={handleCancelPastDialog}
+        handleListen={handleConfirmPastDialog}
       />
     </div>
   );

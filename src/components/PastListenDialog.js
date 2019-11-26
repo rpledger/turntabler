@@ -14,6 +14,7 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import Radio from '@material-ui/core/Radio';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 
+
 const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex'
@@ -28,7 +29,7 @@ const useStyles = makeStyles(theme => ({
 
 }));
 
-export default function ListenNowDialog(props) {
+export default function PastListenDialog(props) {
   const classes = useStyles();
   const { value: valueProp, ...other } = props;
   const [open, setOpen] = React.useState(props.open);
@@ -61,7 +62,7 @@ export default function ListenNowDialog(props) {
     >
     <DialogContent>
         <DialogContentText id="alert-dialog-description">
-          Listen to <b>{props.title}</b> now?
+          Add past listen for <b>{props.title}</b> at:
         </DialogContentText>
       </DialogContent>
       <DialogActions>

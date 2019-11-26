@@ -26,8 +26,8 @@ import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 import InfoIcon from '@material-ui/icons/Info';
 
-import AlbumListItemMenu from './AlbumListItemMenu';
 import ListenNowDialog from './ListenNowDialog';
+import PastListenDialog from './PastListenDialog';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -74,6 +74,7 @@ var tileData = [
 export default function AlbumListItem(props) {
   const classes = useStyles();
   const [openListenNowDialog, setOpenListenNowDialog] = React.useState(false);
+  const [openPastDialog, setOpenPastDialog] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef(null);
 
@@ -113,6 +114,19 @@ export default function AlbumListItem(props) {
     setOpen(false);
   };
 
+  const handleOpenPastDialog = () => {
+    console.log("opening..")
+    setOpenPastDialog(true);
+  };
+
+  const handleCancelPastDialog = () => {
+    setOpenPastDialog(false);
+  };
+
+  const handleConfirmPastDialog = () => {
+    setOpenPastDialog(false);
+  };
+
   return (
     <div className={classes.root}>
           <ListItem>
@@ -124,9 +138,13 @@ export default function AlbumListItem(props) {
               <IconButton onClick={handleOpenListenNowDialog}>
                 <PlayCircleOutlineIcon/>
               </IconButton>
-              <IconButton>
+            </ListItemIcon>
+            <ListItemIcon>
+              <IconButton onClick={handleOpenPastDialog}>
                 <CalendarTodayIcon/>
               </IconButton>
+            </ListItemIcon>
+            <ListItemIcon>
               <IconButton>
                 <InfoIcon/>
               </IconButton>
@@ -138,6 +156,13 @@ export default function AlbumListItem(props) {
             open={openListenNowDialog}
             handleCancel={handleCancelListenNowDialog}
             handleListen={handleConfirmListenNowDialog}
+          />
+          <PastListenDialog
+            title={props.title}
+            id={props.id}
+            open={openPastDialog}
+            handleCancel={handleCancelPastDialog}
+            handleListen={handleConfirmPastDialog}
           />
     </div>
   );
