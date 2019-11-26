@@ -12,20 +12,28 @@ import InboxIcon from '@material-ui/icons/Inbox';
 import DraftsIcon from '@material-ui/icons/Drafts';
 import MenuIcon from '@material-ui/icons/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import MenuList from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import IconButton from '@material-ui/core/IconButton';
+import Toolbar from '@material-ui/core/Toolbar';
+import Paper from '@material-ui/core/Paper';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import Grow from '@material-ui/core/Grow';
+import Popper from '@material-ui/core/Popper';
+import ListSubheader from '@material-ui/core/ListSubheader';
 
 const useStyles = makeStyles(theme => ({
   root: {
-    width: '100%',
-    maxWidth: 360,
-    backgroundColor: theme.palette.background.paper,
+    display: 'flex'
   },
   bigAvatar: {
     width: 50,
     height: 50,
-  }
+  },
+  paper: {
+    marginRight: theme.spacing(2),
+  },
 
 }));
 
@@ -61,40 +69,78 @@ function ListItemLink(props) {
   return <ListItem button component="a" {...props} />;
 }
 
-export default function SimpleList(props) {
+export default function AlbumListItem(props) {
   const classes = useStyles();
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
+  const [open, setOpen] = React.useState(false);
+  const anchorRef = React.useRef(null);
 
-  // function handleChange(event) {
-  //   setAuth(event.target.checked);
-  // }
+  const handleToggle = () => {
+    setOpen(prevOpen => !prevOpen);
+  };
 
-  function handleMenu(event) {
-    setAnchorEl(event.currentTarget);
+  const handleClose = event => {
+    if (anchorRef.current && anchorRef.current.contains(event.target)) {
+      return;
+    }
+
+    setOpen(false);
+  };
+
+  function handleListKeyDown(event) {
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      setOpen(false);
+    }
   }
 
-  function handleClose() {
-    setAnchorEl(null);
-  }
+  // return focus to the button when we transitioned from !open -> open
+  const prevOpen = React.useRef(open);
+  React.useEffect(() => {
+    if (prevOpen.current === true && open === false) {
+      anchorRef.current.focus();
+    }
+
+    prevOpen.current = open;
+  }, [open]);
 
   return (
     <div className={classes.root}>
-      <Divider component="li" />
-        <div>
           <ListItem>
             <ListItemAvatar>
               <Avatar variant="square" className={classes.bigAvatar} alt="Remy Sharp" src={props.img} />
             </ListItemAvatar>
             <ListItemText primary={props.title} secondary={props.artist}/>
             <ListItemIcon>
-              <IconButton>
-                <MoreVertIcon/>
+              <IconButton
+                ref={anchorRef}
+                aria-controls={open ? 'menu-list-grow' : undefined}
+                aria-haspopup="true"
+                onClick={handleToggle}
+              >
+              <MoreVertIcon/>
               </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorRef.current}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={open}
+                onClose={handleClose}
+              >
+                <ListSubheader onClick={handleClose}>{props.title}</ListSubheader>
+                <Divider component="li" />
+                <MenuItem onClick={handleClose}>Listen Now</MenuItem>
+                <MenuItem onClick={handleClose}>Add Past Listen</MenuItem>
+                <MenuItem onClick={handleClose}>More Info</MenuItem>
+              </Menu>
             </ListItemIcon>
           </ListItem>
-          <Divider component="li" />
-        </div>
     </div>
   );
 }
