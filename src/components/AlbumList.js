@@ -6,19 +6,6 @@ import ListSubheader from '@material-ui/core/ListSubheader';
 
 import Album from './Album';
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    width: '100%',
-    maxWidth: 450,
-    backgroundColor: theme.palette.background.paper,
-  },
-  bigAvatar: {
-    width: 50,
-    height: 50,
-  }
-
-}));
-
 var tileData = [
   {
     id: 1,
@@ -82,26 +69,27 @@ var tileData = [
   }
 ]
 
-export default function SimpleList() {
-  const classes = useStyles();
-
-  return (
-    <div className={classes.root}>
-      <List component="nav" aria-label="main mailbox folders">
-      <ListSubheader>A</ListSubheader>
-      <Divider component="li" />
-      {tileData.map(tile => (
-          <div>
-            <Album
-              key={tile.id}
-              title={tile.title}
-              artist={tile.artist}
-              img={tile.img}
-            />
-            <Divider component="li" />
-          </div>
-      ))}
-      </List>
-    </div>
-  );
+class AlbumList extends React.Component {
+  render() {
+    return (
+      <div>
+        <List component="nav" aria-label="main mailbox folders">
+        <ListSubheader>A</ListSubheader>
+        <Divider component="li" />
+        {tileData.map(tile => (
+            <div>
+              <Album
+                key={tile.id}
+                title={tile.title}
+                artist={tile.artist}
+                img={tile.img}
+              />
+              <Divider component="li" />
+            </div>
+        ))}
+        </List>
+      </div>
+    )
+  }
 }
+export default AlbumList;
