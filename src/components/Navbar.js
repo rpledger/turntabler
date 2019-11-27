@@ -27,10 +27,6 @@ function MenuAppBar() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
 
-  function handleChange(event) {
-    setAuth(event.target.checked);
-  }
-
   function handleMenu(event) {
     setAnchorEl(event.currentTarget);
   }
