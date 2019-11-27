@@ -18,13 +18,14 @@ import ConfirmationDialog from './ConfirmationDialog';
 
 class ListenDialog extends React.Component {
   render() {
-    if (!this.props.show) {
-      return null;
-    }
+    // if (!this.props.show) {
+    //   console.log("No show")
+    //   return null;
+    // }
+    console.log("Show")
 
     return (
-      <div>
-        <ConfirmationDialog>
+        <ConfirmationDialog >
           <DialogContent>
               <DialogContentText id="alert-dialog-description">
                 Listen to <b>{this.props.title}</b> now?
@@ -39,7 +40,6 @@ class ListenDialog extends React.Component {
               </Button>
             </DialogActions>
         </ConfirmationDialog>
-      </div>
     );
   }
 }

@@ -27,6 +27,7 @@ import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 import InfoIcon from '@material-ui/icons/Info';
 
 import ListenDialog from './ListenDialog';
+import ListenNowDialog from './ListenNowDialog';
 import PastListenDialog from './PastListenDialog';
 
 class Album extends React.Component {
@@ -75,10 +76,10 @@ class Album extends React.Component {
           </IconButton>
         </ListItemIcon>
       </ListItem>
-      <ListenDialog
+      <ListenNowDialog
         title={this.props.title}
         id={this.props.id}
-        open={this.state.isListenDialogOpen}
+        show={this.state.isListenDialogOpen}
         handleCancel={this.toggleListenDialog}
         handleListen={this.toggleListenDialog}
       />

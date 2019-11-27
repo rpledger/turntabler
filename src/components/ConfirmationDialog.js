@@ -16,12 +16,12 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 class ConfirmationDialog extends React.Component {
   render() {
-    if (!this.props.show) {
-      return null;
-    }
+    // if (!this.props.show) {
+    //   console.log("No show in Confirmation")
+    //   return null;
+    // }
 
     return (
-      <div>
         <Dialog
           disableBackdropClick
           disableEscapeKeyDown
@@ -31,7 +31,6 @@ class ConfirmationDialog extends React.Component {
         >
           {this.props.children}
         </Dialog>
-      </div>
     );
   }
 }
