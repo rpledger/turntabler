@@ -26,7 +26,6 @@ import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 import InfoIcon from '@material-ui/icons/Info';
 
-import ListenDialog from './ListenDialog';
 import ListenNowDialog from './ListenNowDialog';
 import PastListenDialog from './PastListenDialog';
 
@@ -86,7 +85,7 @@ class Album extends React.Component {
       <PastListenDialog
         title={this.props.title}
         id={this.props.id}
-        open={this.state.isPastDialogOpen}
+        show={this.state.isPastDialogOpen}
         handleCancel={this.togglePastDialog}
         handleListen={this.togglePastDialog}
       />

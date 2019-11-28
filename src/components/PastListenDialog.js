@@ -32,24 +32,6 @@ const useStyles = makeStyles(theme => ({
 
 export default function PastListenDialog(props) {
   const classes = useStyles();
-  const { value: valueProp, ...other } = props;
-  const [open, setOpen] = React.useState(props.open);
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleCancel = () => {
-    setOpen(false);
-  };
-
-  const handleOk = () => {
-    setOpen(false);
-  };
 
   return (
     <div>
@@ -58,8 +40,7 @@ export default function PastListenDialog(props) {
       disableEscapeKeyDown
       maxWidth="xs"
       aria-labelledby="confirmation-dialog-title"
-      open={open}
-      {...other}
+      open={props.show}
     >
     <DialogContent>
         <DialogContentText id="alert-dialog-description">
