@@ -23,7 +23,6 @@ const useStyles = makeStyles(theme => ({
 
 function MenuAppBar() {
   const classes = useStyles();
-  const [auth, setAuth] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
 
@@ -45,7 +44,6 @@ function MenuAppBar() {
           <Typography variant="h6" className={classes.title}>
             Turn Tabler
           </Typography>
-          {auth && (
             <div>
               <IconButton
                 aria-owns={open ? 'menu-appbar' : undefined}
@@ -74,7 +72,6 @@ function MenuAppBar() {
                 <MenuItem onClick={handleClose}>Sign Out</MenuItem>
               </Menu>
             </div>
-          )}
         </Toolbar>
       </AppBar>
     </div>
