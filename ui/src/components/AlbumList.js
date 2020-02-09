@@ -26,26 +26,56 @@ var tileData = {
 }
 
 class AlbumList extends React.Component {
-  render() {
-    return (
-      <div>
-        <List component="nav" aria-label="main mailbox folders">
-        {
-          Object.keys(tileData).map((key) => (
-            <div>
-              <Album
-                key={key}
-                title={tileData[key].title}
-                artist={tileData[key].artist}
-                img={tileData[key].img}
-              />
-              <Divider component="li" />
-            </div>
-          ))
-        }
-        </List>
-      </div>
+  constructor(props){
+    super(props);
+    this.state = {
+      error: null,
+      isLoaded: false,
+      albumList: {}
+    };
+  }
+
+  componentDidMount() {
+    fetch("http://localhost:4000/releases")
+    .then(res => res.json())
+    .then(
+      (result) => {
+        console.log("Loaded")
+        this.setState({
+          isLoaded: true,
+          albumList: result
+        })
+      }
     )
+  }
+
+  render() {
+    const { error, isLoaded, albumList } = this.state;
+    if (error) {
+      return <div>Error: {error.message}</div>;
+    } else if (!isLoaded) {
+      return <div>Loading...</div>;
+    } else {
+      return(
+        <div>
+          <List component="nav" aria-label="main mailbox folders">
+          {
+            Object.keys(tileData).map((key) => (
+              <div>
+                <Album
+                  key={key}
+                  title={tileData[key].title}
+                  artist={tileData[key].artist}
+                  img={tileData[key].img}
+                />
+                <Divider component="li" />
+              </div>
+            ))
+          }
+          </List>
+        </div>
+      )
+    }
   }
 }
 export default AlbumList;
