@@ -36,7 +36,7 @@ class AlbumList extends React.Component {
   }
 
   componentDidMount() {
-    fetch("http://localhost:4000/releases")
+    fetch("/releases")
     .then(res => res.json())
     .then(
       (result) => {
@@ -60,13 +60,13 @@ class AlbumList extends React.Component {
         <div>
           <List component="nav" aria-label="main mailbox folders">
           {
-            Object.keys(tileData).map((key) => (
+            Object.keys(albumList).map((key) => (
               <div>
                 <Album
                   key={key}
-                  title={tileData[key].title}
-                  artist={tileData[key].artist}
-                  img={tileData[key].img}
+                  title={albumList[key].title}
+                  artist={albumList[key].artist}
+                  img={albumList[key].thumb}
                 />
                 <Divider component="li" />
               </div>

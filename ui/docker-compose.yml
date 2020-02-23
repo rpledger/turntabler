@@ -1,0 +1,36 @@
+version: '3.7'
+services:
+  turn_react:
+    container_name: turn_react
+    image: turn_react:latest
+    expose:
+      - 3000
+    ports:
+      - 3001:3000
+    volumes:
+      - '.:/app'
+      - '/app/node_modules'
+
+  turn_data:
+    container_name: turn_data
+    image: turn_data:latest
+    expose:
+      - 5000
+    ports:
+      - 4000:5000
+    depends_on:
+      - db
+
+  db:
+    image: postgres
+    restart: always
+    expose:
+      - 5432
+    environment:
+      POSTGRES_PASSWORD: "password"
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8081:8080
