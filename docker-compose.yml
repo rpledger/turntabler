@@ -1,18 +1,18 @@
 version: '3.7'
 services:
   turn_react:
-    container_name: turn_react
+    #container_name: turn_react
     image: turn_react:latest
     expose:
       - 3000
     ports:
       - 3001:3000
     volumes:
-      - '.:/app'
+      - './ui:/app'
       - '/app/node_modules'
 
   turn_data:
-    container_name: turn_data
+    #container_name: turn_data
     image: turn_data:latest
     expose:
       - 5000
