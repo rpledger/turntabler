@@ -28,6 +28,17 @@ class Album extends React.Component {
     });
   }
 
+  listenDialog = () => {
+    console.log(this.props)
+    fetch('/listens/' + this.props.id, {
+    method: 'post',
+    body: JSON.stringify({})
+  })
+    this.setState({
+      isListenDialogOpen: !this.state.isListenDialogOpen
+    });
+  }
+
   togglePastDialog = () => {
     this.setState({
       isPastDialogOpen: !this.state.isPastDialogOpen
@@ -60,14 +71,14 @@ class Album extends React.Component {
       </ListItem>
       <ListenNowDialog
         title={this.props.title}
-        id={this.props.id}
+        id={this.props.key}
         show={this.state.isListenDialogOpen}
         handleCancel={this.toggleListenDialog}
-        handleListen={this.toggleListenDialog}
+        handleListen={this.listenDialog}
       />
       <PastListenDialog
         title={this.props.title}
-        id={this.props.id}
+        id={this.props.key}
         show={this.state.isPastDialogOpen}
         handleCancel={this.togglePastDialog}
         handleListen={this.togglePastDialog}

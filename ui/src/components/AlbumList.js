@@ -4,26 +4,6 @@ import Divider from '@material-ui/core/Divider';
 
 import Album from './Album';
 
-var tileData = {
-  "1": {
-    id: 1,
-    img: "https://img.discogs.com/SwnFq01J1XAXArAhfvgtG6EgkH0=/fit-in/300x300/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-986527-1293716829.jpeg.jpg",
-    title: "Emotionalism",
-    artist: "Avett Brothers"
-  },
-  "2": {
-    id: 2,
-    img: "https://img.discogs.com/7XGz7VuFH-dp80PqS_M-BLe7GGA=/fit-in/300x300/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-1963341-1262735484.jpeg.jpg",
-    title: "I and Love and You",
-    artist: "Avett Brothers"
-  },
-  "3": {
-    id: 3,
-    img: "https://img.discogs.com/7thNTBY7jzWL6Oa7QXwCssboU7k=/fit-in/300x300/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-2093811-1263645509.jpeg.jpg",
-    title: "The Second Gleam",
-    artist: "Avett Brothers"
-  }
-}
 
 class AlbumList extends React.Component {
   constructor(props){
@@ -63,6 +43,7 @@ class AlbumList extends React.Component {
             Object.keys(albumList).map((key) => (
               <div>
                 <Album
+                  id={key}
                   key={key}
                   title={albumList[key].title}
                   artist={albumList[key].artist}
