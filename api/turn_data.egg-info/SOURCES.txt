@@ -1,0 +1,6 @@
+setup.py
+turn_data.egg-info/PKG-INFO
+turn_data.egg-info/SOURCES.txt
+turn_data.egg-info/dependency_links.txt
+turn_data.egg-info/requires.txt
+turn_data.egg-info/top_level.txt

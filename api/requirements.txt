@@ -1,0 +1,8 @@
+flask
+flask_sqlalchemy
+flask-login
+flask-wtf
+wtforms
+sqlalchemy_utils
+requests
+psycopg2-binary
