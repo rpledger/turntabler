@@ -77,10 +77,16 @@ def get_releases():
 def get_listens():
     users = User.query.all()
     user = users[0]
-    listens_dict = dict()
+    # listens_dict = dict()
+    # for listen in user.listens:
+    #     listens_dict[listen.id] = listen.to_json()
+    release_listen_dict = dict()
     for listen in user.listens:
-        listens_dict[listen.id] = listen.to_json()
-    return jsonify(listens_dict)
+        try:
+            release_listen_dict[listen.release.id].append(listen.to_json())
+        except KeyError:
+            release_listen_dict[listen.release.id] = [listen.to_json()]
+    return jsonify(release_listen_dict)
 
 
 def get_user_releases_list(id):
