@@ -88,7 +88,6 @@ export default function AlbumListItemMenu(props) {
   };
 
   const handleOpenPastDialog = () => {
-    console.log("opening..")
     setOpenPastDialog(true);
   };
 

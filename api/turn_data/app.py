@@ -77,9 +77,6 @@ def get_releases():
 def get_listens():
     users = User.query.all()
     user = users[0]
-    # listens_dict = dict()
-    # for listen in user.listens:
-    #     listens_dict[listen.id] = listen.to_json()
     release_listen_dict = dict()
     for listen in user.listens:
         try:
@@ -110,6 +107,8 @@ def get_user_releases_listens_list(id):
 
 @app.route('/listens/<int:release_id>', methods=['POST'])
 def listen_now(release_id):
+    # data = request.get_json()
+    # dtg = datetime.strptime(data['time'])
     users = User.query.all()
     user = users[0]
     app.logger.info(release_id)
