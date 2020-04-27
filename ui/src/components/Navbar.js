@@ -112,42 +112,17 @@ function MenuAppBar() {
     <div className={classes.root}>
       <AppBar position="static">
         <Toolbar>
-          <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="Menu" onClick={toggleDrawer(true)}>
-            <MenuIcon />
-          </IconButton>
-          <Drawer anchor="left" open={state["openDrawer"]} onClose={toggleDrawer(false)}>
-            {list}
-          </Drawer>
+
           <Typography variant="h6" className={classes.title}>
             Turn Tabler
           </Typography>
             <div>
-              <IconButton
-                aria-owns={open ? 'menu-appbar' : undefined}
-                aria-haspopup="true"
-                onClick={handleMenu}
-                color="inherit"
-              >
-                <AccountCircle />
+              <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="Menu" onClick={toggleDrawer(true)}>
+                <MenuIcon />
               </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorEl}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                open={open}
-                onClose={handleClose}
-              >
-                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                <MenuItem onClick={handleClose}>My Account</MenuItem>
-                <MenuItem onClick={handleClose}>Sign Out</MenuItem>
-              </Menu>
+              <Drawer anchor="right" open={state["openDrawer"]} onClose={toggleDrawer(false)}>
+                {list}
+              </Drawer>
             </div>
         </Toolbar>
       </AppBar>
