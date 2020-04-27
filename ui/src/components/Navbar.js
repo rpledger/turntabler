@@ -23,6 +23,8 @@ import AlbumIcon from '@material-ui/icons/Album';
 import RadioIcon from '@material-ui/icons/Radio';
 import SettingsIcon from '@material-ui/icons/Settings';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import Link from '@material-ui/core/Link';
+
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -35,6 +37,10 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1,
   },
 }));
+
+function ListItemLink(props) {
+  return <ListItem button component="a" {...props} />;
+}
 
 function MenuAppBar() {
   const classes = useStyles();
@@ -71,18 +77,18 @@ function MenuAppBar() {
       onKeyDown={toggleDrawer(false)}
     >
       <List>
-        <ListItem button key="Dashboard">
+        <ListItemLink button key="Dashboard" href="/">
           <ListItemIcon><DashboardIcon /></ListItemIcon>
           <ListItemText primary="Dashboard" />
-        </ListItem>
-        <ListItem button key="Albums">
+        </ListItemLink>
+        <ListItemLink button key="Albums" href="/albums">
           <ListItemIcon><AlbumIcon /></ListItemIcon>
           <ListItemText primary="Albums" />
-        </ListItem>
-        <ListItem button key="Plays">
+        </ListItemLink>
+        <ListItemLink button key="Plays" href="/">
           <ListItemIcon><RadioIcon /></ListItemIcon>
           <ListItemText primary="Plays" />
-        </ListItem>
+        </ListItemLink>
       </List>
       <Divider />
       <List>
