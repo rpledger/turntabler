@@ -1,5 +1,6 @@
 import React from 'react';
 import MUIDataTable from "mui-datatables";
+import CustomAddListen from "./CustomAddListen"
 
 const columns = [
   {
@@ -53,7 +54,10 @@ const data = [
 ];
 
 const options = {
-  print: false
+  print: false,
+  customToolbarSelect: (selectedRows, displayData, setSelectedRows) => (
+    <CustomAddListen selectedRows={selectedRows} displayData={displayData} setSelectedRows={setSelectedRows} />
+  ),
 };
 
 class MUITableAlbums extends React.Component {
