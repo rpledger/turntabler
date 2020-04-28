@@ -37,6 +37,10 @@ release3 = Release(artist="Avett Brothers", title="The Second Gleam", thumb="htt
 user.releases.append(release1)
 user.releases.append(release2)
 user.releases.append(release3)
+listen1 = Listen(release_id=1)
+listen2 = Listen(release_id=2)
+user.listens.append(listen1)
+user.listens.append(listen2)
 db.session.add(user)
 db.session.commit()
 
