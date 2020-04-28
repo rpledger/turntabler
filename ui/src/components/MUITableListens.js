@@ -55,7 +55,7 @@ const options = {
   print: false
 };
 
-class MUITable extends React.Component {
+class MUITableListens extends React.Component {
   render() {
     return (
       <MUIDataTable
@@ -67,4 +67,4 @@ class MUITable extends React.Component {
     )
   }
 }
-export default MUITable;
+export default MUITableListens;

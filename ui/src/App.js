@@ -7,7 +7,8 @@ import Navbar from './components/Navbar';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
 import AlbumList from './components/AlbumList';
-import MUITable from './components/MUITable';
+import MUITableAlbums from './components/MUITableAlbums';
+import MUITableListens from './components/MUITableListens';
 
 class App extends Component {
   render() {
@@ -17,8 +18,8 @@ class App extends Component {
           <Navbar />
           <Route exact path="/signIn" component={SignIn} />
           <Route path="/signUp" component={SignUp} />
-          <Route path="/albums" component={AlbumList} />
-          <Route path="/listens" component={MUITable} />
+          <Route path="/albums" component={MUITableAlbums} />
+          <Route path="/listens" component={MUITableListens} />
         </div>
       </Router>
     );
