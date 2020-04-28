@@ -3,7 +3,7 @@ import MUIDataTable from "mui-datatables";
 
 const columns = [
   {
-   name: "img",
+   name: "thumb",
    label: "Image",
    options: {
     filter: false,
@@ -17,7 +17,7 @@ const columns = [
    }
   },
  {
-  name: "album",
+  name: "title",
   label: "Album",
   options: {
    filter: true,
@@ -31,18 +31,19 @@ const columns = [
    filter: true,
    sort: true,
   }
- },
- {
-  name: "last_listen_dtg",
-  label: "Last Play",
-  options: {
-   filter: false,
-   sort: true,
-   customBodyRender: (value, tableMeta, updateValue) => (
-     new Date(value).toLocaleDateString()
-   )
-  }
  }
+ // ,
+ // {
+ //  name: "last_listen_dtg",
+ //  label: "Last Play",
+ //  options: {
+ //   filter: false,
+ //   sort: true,
+ //   customBodyRender: (value, tableMeta, updateValue) => (
+ //     new Date(value).toLocaleDateString()
+ //   )
+ //  }
+ // }
 ];
 
 const data = [
@@ -89,7 +90,7 @@ class MUITableAlbums extends React.Component {
       return(
         <MUIDataTable
           title={"Albums"}
-          data={data}
+          data={albumList}
           columns={columns}
           options={options}
         />

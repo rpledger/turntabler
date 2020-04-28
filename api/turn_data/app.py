@@ -71,23 +71,27 @@ def add_user():
 def get_releases():
     users = User.query.all()
     user = users[0]
-    releases_dict = dict()
+    #releases_dict = dict()
+    releases = []
     for release in user.releases:
-        releases_dict[release.id] = release.to_json()
-    return jsonify(releases_dict)
+        releases.append(release.to_json())
+        #releases_dict[release.id] = release.to_json()
+    return jsonify(releases) #releases_dict)
 
 
 @app.route('/listens', methods=['GET'])
 def get_listens():
     users = User.query.all()
     user = users[0]
-    release_listen_dict = dict()
+    #release_listen_dict = dict()
+    listens = []
     for listen in user.listens:
-        try:
-            release_listen_dict[listen.release.id].append(listen.to_json())
-        except KeyError:
-            release_listen_dict[listen.release.id] = [listen.to_json()]
-    return jsonify(release_listen_dict)
+        listens.append(listen.to_json())
+        # try:
+        #     release_listen_dict[listen.release.id].append(listen.to_json())
+        # except KeyError:
+        #     release_listen_dict[listen.release.id] = [listen.to_json()]
+    return jsonify(listens) #release_listen_dict)
 
 
 def get_user_releases_list(id):

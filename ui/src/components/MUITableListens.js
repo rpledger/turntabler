@@ -3,7 +3,7 @@ import MUIDataTable from "mui-datatables";
 
 const columns = [
   {
-   name: "img",
+   name: "thumb",
    label: "Image",
    options: {
     filter: false,
@@ -17,7 +17,7 @@ const columns = [
    }
   },
  {
-  name: "album",
+  name: "title",
   label: "Album",
   options: {
    filter: true,
@@ -81,7 +81,7 @@ class MUITableListens extends React.Component {
   }
 
   render() {
-    const { error, isLoaded, albumList } = this.state;
+    const { error, isLoaded, playList } = this.state;
     if (error) {
       return <div>Error: {error.message}</div>;
     } else if (!isLoaded) {
@@ -90,7 +90,7 @@ class MUITableListens extends React.Component {
       return(
         <MUIDataTable
           title={"Album Plays"}
-          data={data}
+          data={playList}
           columns={columns}
           options={options}
         />
