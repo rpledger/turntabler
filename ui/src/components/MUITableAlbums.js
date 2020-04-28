@@ -56,15 +56,45 @@ const options = {
 };
 
 class MUITableAlbums extends React.Component {
-  render() {
-    return (
-      <MUIDataTable
-        title={"Albums"}
-        data={data}
-        columns={columns}
-        options={options}
-      />
+  constructor(props){
+    super(props);
+    this.state = {
+      error: null,
+      isLoaded: false,
+      albumList: {}
+    };
+  }
+
+  componentDidMount() {
+    fetch("/releases")
+    .then(res => res.json())
+    .then(
+      (result) => {
+        console.log("Loaded")
+        this.setState({
+          isLoaded: true,
+          albumList: result
+        })
+      }
     )
+  }
+
+  render() {
+    const { error, isLoaded, albumList } = this.state;
+    if (error) {
+      return <div>Error: {error.message}</div>;
+    } else if (!isLoaded) {
+      return <div>Loading...</div>;
+    } else {
+      return(
+        <MUIDataTable
+          title={"Albums"}
+          data={data}
+          columns={columns}
+          options={options}
+        />
+      )
+    }
   }
 }
 export default MUITableAlbums;

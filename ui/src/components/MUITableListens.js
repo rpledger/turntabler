@@ -56,15 +56,46 @@ const options = {
 };
 
 class MUITableListens extends React.Component {
-  render() {
-    return (
-      <MUIDataTable
-        title={"Album Plays"}
-        data={data}
-        columns={columns}
-        options={options}
-      />
+
+  constructor(props){
+    super(props);
+    this.state = {
+      error: null,
+      isLoaded: false,
+      playList: {}
+    };
+  }
+
+  componentDidMount() {
+    fetch("/listens")
+    .then(res => res.json())
+    .then(
+      (result) => {
+        console.log("Loaded")
+        this.setState({
+          isLoaded: true,
+          playList: result
+        })
+      }
     )
+  }
+
+  render() {
+    const { error, isLoaded, albumList } = this.state;
+    if (error) {
+      return <div>Error: {error.message}</div>;
+    } else if (!isLoaded) {
+      return <div>Loading...</div>;
+    } else {
+      return(
+        <MUIDataTable
+          title={"Album Plays"}
+          data={data}
+          columns={columns}
+          options={options}
+        />
+      )
+    }
   }
 }
 export default MUITableListens;
