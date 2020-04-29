@@ -40,7 +40,7 @@ class CustomToolbarSelect extends React.Component {
 
     return (
       <div className={classes.iconContainer}>
-        <Tooltip title={"Add a Play"}>
+        <Tooltip title={"Add Play(s)"}>
           <IconButton className={classes.iconButton} onClick={this.handleClickDeselectAll}>
             <RadioIcon className={classes.icon} />
           </IconButton>
