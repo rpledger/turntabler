@@ -50,7 +50,7 @@ class Release(db.Model):
             'id': self.id,
             'title': self.title,
             'artist': self.artist,
-            'thumb': self.thumb,
+            'thumb': self.thumb
         }
 
 
@@ -76,5 +76,6 @@ class Listen(db.Model):
             'release_id': self.release_id,
             'artist': self.release.artist,
             'title': self.release.title,
-            'user': self.user.id
+            'user': self.user.id,
+            'thumb': self.release.thumb
         }

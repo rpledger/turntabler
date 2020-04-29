@@ -37,6 +37,10 @@ release3 = Release(artist="Avett Brothers", title="The Second Gleam", thumb="htt
 user.releases.append(release1)
 user.releases.append(release2)
 user.releases.append(release3)
+listen1 = Listen(release_id=1)
+listen2 = Listen(release_id=2)
+user.listens.append(listen1)
+user.listens.append(listen2)
 db.session.add(user)
 db.session.commit()
 
@@ -67,26 +71,27 @@ def add_user():
 def get_releases():
     users = User.query.all()
     user = users[0]
-    releases_dict = dict()
+    #releases_dict = dict()
+    releases = []
     for release in user.releases:
-        releases_dict[release.id] = release.to_json()
-    return jsonify(releases_dict)
+        releases.append(release.to_json())
+        #releases_dict[release.id] = release.to_json()
+    return jsonify(releases) #releases_dict)
 
 
 @app.route('/listens', methods=['GET'])
 def get_listens():
     users = User.query.all()
     user = users[0]
-    # listens_dict = dict()
-    # for listen in user.listens:
-    #     listens_dict[listen.id] = listen.to_json()
-    release_listen_dict = dict()
+    #release_listen_dict = dict()
+    listens = []
     for listen in user.listens:
-        try:
-            release_listen_dict[listen.release.id].append(listen.to_json())
-        except KeyError:
-            release_listen_dict[listen.release.id] = [listen.to_json()]
-    return jsonify(release_listen_dict)
+        listens.append(listen.to_json())
+        # try:
+        #     release_listen_dict[listen.release.id].append(listen.to_json())
+        # except KeyError:
+        #     release_listen_dict[listen.release.id] = [listen.to_json()]
+    return jsonify(listens) #release_listen_dict)
 
 
 def get_user_releases_list(id):
@@ -110,6 +115,8 @@ def get_user_releases_listens_list(id):
 
 @app.route('/listens/<int:release_id>', methods=['POST'])
 def listen_now(release_id):
+    # data = request.get_json()
+    # dtg = datetime.strptime(data['time'])
     users = User.query.all()
     user = users[0]
     app.logger.info(release_id)
