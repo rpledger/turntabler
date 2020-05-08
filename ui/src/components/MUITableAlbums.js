@@ -4,6 +4,13 @@ import CustomAddListen from "./CustomAddListen"
 
 const columns = [
   {
+   name: "id",
+   label: "Id",
+   options: {
+     display: false,
+   }
+  },
+  {
    name: "thumb",
    label: "Image",
    options: {

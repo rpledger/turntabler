@@ -32,6 +32,12 @@ class CustomToolbarSelect extends React.Component {
   };
 
   handleClickDeselectAll = () => {
+    this.props.selectedRows.data.forEach(row =>
+      fetch("/listens/" + this.props.displayData[row.index].data[0], {
+        method: 'post',
+        body: JSON.stringify({})
+      })
+    )
     this.props.setSelectedRows([]);
   };
 

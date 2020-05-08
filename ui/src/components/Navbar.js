@@ -84,7 +84,7 @@ function MenuAppBar() {
           <ListItemIcon><AlbumIcon /></ListItemIcon>
           <ListItemText primary="Albums" />
         </ListItemLink>
-        <ListItemLink button key="Plays" href="/listens">
+        <ListItemLink button key="Plays" href="/plays">
           <ListItemIcon><RadioIcon /></ListItemIcon>
           <ListItemText primary="Plays" />
         </ListItemLink>
