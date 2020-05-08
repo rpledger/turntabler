@@ -71,52 +71,24 @@ def add_user():
 def get_releases():
     users = User.query.all()
     user = users[0]
-    #releases_dict = dict()
     releases = []
     for release in user.releases:
         releases.append(release.to_json())
-        #releases_dict[release.id] = release.to_json()
-    return jsonify(releases) #releases_dict)
+    return jsonify(releases)
 
 
 @app.route('/listens', methods=['GET'])
 def get_listens():
     users = User.query.all()
     user = users[0]
-    #release_listen_dict = dict()
     listens = []
     for listen in user.listens:
         listens.append(listen.to_json())
-        # try:
-        #     release_listen_dict[listen.release.id].append(listen.to_json())
-        # except KeyError:
-        #     release_listen_dict[listen.release.id] = [listen.to_json()]
-    return jsonify(listens) #release_listen_dict)
-
-
-def get_user_releases_list(id):
-    user = User.query.get(id)
-    releases = user.releases
-    return releases
-
-
-def get_user_releases_listens_list(id):
-    user = User.query.get(id)
-    listens = user.listens
-    release_listen_dict = dict()
-    for listen in listens:
-        try:
-            release_listen_dict[listen.release.id].append(listen)
-        except KeyError:
-            release_listen_dict[listen.release.id] = [listen]
-
-    return release_listen_dict
+    return jsonify(listens)
 
 
 @app.route('/listens/<int:release_id>', methods=['POST'])
 def listen_now(release_id):
-    # data = request.get_json()
-    # dtg = datetime.strptime(data['time'])
     users = User.query.all()
     user = users[0]
     app.logger.info(release_id)
