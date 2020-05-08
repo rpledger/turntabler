@@ -19,7 +19,7 @@ class App extends Component {
           <Route exact path="/signIn" component={SignIn} />
           <Route path="/signUp" component={SignUp} />
           <Route path="/albums" component={MUITableAlbums} />
-          <Route path="/listens" component={MUITableListens} />
+          <Route path="/plays" component={MUITableListens} />
         </div>
       </Router>
     );

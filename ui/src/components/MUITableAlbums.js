@@ -4,6 +4,13 @@ import CustomAddListen from "./CustomAddListen"
 
 const columns = [
   {
+   name: "id",
+   label: "Id",
+   options: {
+     display: false,
+   }
+  },
+  {
    name: "thumb",
    label: "Image",
    options: {
@@ -55,6 +62,7 @@ const data = [
 
 const options = {
   print: false,
+  download: false,
   customToolbarSelect: (selectedRows, displayData, setSelectedRows) => (
     <CustomAddListen selectedRows={selectedRows} displayData={displayData} setSelectedRows={setSelectedRows} />
   ),
