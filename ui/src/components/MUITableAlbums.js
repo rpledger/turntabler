@@ -1,4 +1,5 @@
 import React from 'react';
+import { Redirect } from 'react-router-dom';
 import MUIDataTable from "mui-datatables";
 import CustomAddListen from "./CustomAddListen"
 
@@ -79,10 +80,17 @@ class MUITableAlbums extends React.Component {
   }
 
   componentDidMount() {
-    fetch("/releases")
+    fetch("/releases", {
+      method: "get",
+      headers: {
+      'Authorization': 'Bearer ' + localStorage.getItem("token")
+    }})
     .then(res => res.json())
     .then(
       (result) => {
+        if (result["msg"]) {
+          this.setState({error: result["msg"]})
+        }
         console.log("Loaded")
         this.setState({
           isLoaded: true,
@@ -95,9 +103,9 @@ class MUITableAlbums extends React.Component {
   render() {
     const { error, isLoaded, albumList } = this.state;
     if (error) {
-      return <div>Error: {error.message}</div>;
+      return <Redirect to="/signIn" />; //<div>Error: {error.message}</div>;
     } else if (!isLoaded) {
-      return <div>Loading...</div>;
+      return <div></div>;
     } else {
       return(
         <MUIDataTable

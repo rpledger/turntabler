@@ -2,6 +2,7 @@ flask
 flask_sqlalchemy
 flask-login
 flask-wtf
+flask_jwt_extended
 wtforms
 sqlalchemy_utils
 requests
