@@ -13,16 +13,6 @@ import MUITableListens from './components/MUITableListens';
 class App extends Component {
   constructor(props){
     super(props);
-    this.state = {
-      token: ''
-    };
-    this.handleChange = this.handleChange.bind(this);
-  }
-
-  handleChange(token) {
-    console.log("Token in App: " + token)
-    this.setState({token: token});
-    return <Redirect to='/albums'  />
   }
 
   render() {
@@ -30,10 +20,11 @@ class App extends Component {
       <Router>
         <div>
           <Navbar />
-          <Route exact path="/signIn" component={() => <SignIn handleToken={this.handleChange}/>} />
+          <Route exact path="/" component={SignIn} />
+          <Route exact path="/signIn" component={SignIn} />
           <Route path="/signUp" component={SignUp} />
-          <Route path="/albums" component={() => <MUITableAlbums token={this.state.token}/> } />
-          <Route path="/plays" component={() => <MUITableListens token={this.state.token}/> } />
+          <Route path="/albums" component={MUITableAlbums} />
+          <Route path="/plays" component={MUITableListens} />
         </div>
       </Router>
     );

@@ -1,4 +1,6 @@
 import React from 'react';
+import { Redirect } from 'react-router-dom';
+import { withStyles } from "@material-ui/core/styles";
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -26,7 +28,7 @@ function Copyright() {
   );
 }
 
-const useStyles = makeStyles(theme => ({
+const useStyles = theme => ({
   '@global': {
     body: {
       backgroundColor: theme.palette.common.white,
@@ -49,7 +51,7 @@ const useStyles = makeStyles(theme => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
-}));
+});
 
 
 class SignIn extends React.Component {
@@ -58,7 +60,7 @@ class SignIn extends React.Component {
     this.state = {
       username: '',
       password: '',
-      token: ''
+      authenticated: localStorage.getItem("token") != 'undefined'
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -84,7 +86,7 @@ class SignIn extends React.Component {
         // this.props.handleToken(result["access_token"])
         localStorage.setItem('token', result["access_token"]);
         this.setState({
-          token: result["access_token"]
+          authenticated: true
         })
       }
     )
@@ -92,17 +94,21 @@ class SignIn extends React.Component {
   }
 
   render() {
+    const { classes } = this.props;
+    if (this.state.authenticated) {
+      return <Redirect to="/albums"/>
+    }
     return (
       <Container component="main" maxWidth="xs">
         <CssBaseline />
-        <div className={useStyles.paper}>
-          <Avatar className={useStyles.avatar}>
+        <div className={classes.paper}>
+          <Avatar className={classes.avatar}>
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <form className={useStyles.form} noValidate onSubmit={this.handleSubmit}>
+          <form className={classes.form} noValidate action="/albums" onSubmit={this.handleSubmit}>
             <TextField
               variant="outlined"
               margin="normal"
@@ -136,7 +142,7 @@ class SignIn extends React.Component {
               fullWidth
               variant="contained"
               color="primary"
-              className={useStyles.submit}
+              className={classes.submit}
             >
               Sign In
             </Button>
@@ -161,5 +167,4 @@ class SignIn extends React.Component {
     )
   }
 }
-
-export default SignIn;
+export default withStyles(useStyles, { withTheme: true })(SignIn);
