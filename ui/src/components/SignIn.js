@@ -60,7 +60,7 @@ class SignIn extends React.Component {
     this.state = {
       username: '',
       password: '',
-      authenticated: localStorage.getItem("token") != 'undefined'
+      authenticated: localStorage.getItem("token") != null && localStorage.getItem("token") != 'undefined'
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
