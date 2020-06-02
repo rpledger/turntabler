@@ -97,7 +97,6 @@ def get_users():
 
     return result
 
-
 # @app.route('/signup', methods=['GET', 'POST'])
 # def signup_user():
 #  data = request.get_json()
