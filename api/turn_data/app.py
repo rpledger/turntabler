@@ -97,16 +97,16 @@ def get_users():
 
     return result
 
-# @app.route('/signup', methods=['GET', 'POST'])
-# def signup_user():
-#  data = request.get_json()
-#
-#  new_user = User(name=data['name'])
-#  user.set_password("password")
-#  db.session.add(new_user)
-#  db.session.commit()
-#
-#  return jsonify({'message': 'registered successfully'})
+@app.route('/signup', methods=['POST'])
+def signup_user():
+ data = request.get_json()
+
+ new_user = User(username=data['username'])
+ new_user.set_password(data['password'])
+ db.session.add(new_user)
+ db.session.commit()
+
+ return jsonify({'message': 'registered successfully'})
 #
 #
 # @app.route('/login', methods=['GET', 'POST'])
