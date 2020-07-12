@@ -24,6 +24,7 @@ import RadioIcon from '@material-ui/icons/Radio';
 import SettingsIcon from '@material-ui/icons/Settings';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Link from '@material-ui/core/Link';
+import { Redirect } from 'react-router-dom';
 
 
 const useStyles = makeStyles(theme => ({
@@ -66,6 +67,29 @@ function MenuAppBar() {
     setState({ ...state, openDrawer: openDrawer });
   };
 
+  function removeToken() {
+    localStorage.removeItem("token");
+    window.location.reload(false);
+  }
+
+
+  function signInOrOut() {
+  if (localStorage.getItem("token") == null || localStorage.getItem("token") == "undefined") {
+    return (<div>
+      <ListItem button key="Sign In" href="/signIn">
+        <ListItemIcon><ExitToAppIcon /></ListItemIcon>
+        <ListItemText primary="Sign In" />
+      </ListItem>
+    </div>)
+  }
+  return (<div>
+    <ListItem button key="Sign Out" onClick={removeToken}>
+      <ListItemIcon><ExitToAppIcon /></ListItemIcon>
+      <ListItemText primary="Sign Out" />
+    </ListItem>
+  </div>)
+}
+
   const list = (
     <div
       className={clsx(classes.list, {
@@ -99,10 +123,7 @@ function MenuAppBar() {
           <ListItemIcon><SettingsIcon /></ListItemIcon>
           <ListItemText primary="My Account" />
         </ListItem>
-        <ListItem button key="Sign Out">
-          <ListItemIcon><ExitToAppIcon /></ListItemIcon>
-          <ListItemText primary="Sign Out" />
-        </ListItem>
+        {signInOrOut()}
       </List>
     </div>
   )

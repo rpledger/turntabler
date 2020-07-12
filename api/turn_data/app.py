@@ -4,6 +4,11 @@ from flask import Flask, redirect, url_for
 from flask import jsonify
 from flask import request
 
+from flask_jwt_extended import (
+    JWTManager, jwt_required, create_access_token,
+    get_jwt_identity
+)
+
 from turn_data.models import db, User, Release, Listen
 from turn_data.config import Config
 
@@ -27,50 +32,107 @@ def create_app():
 
 
 app = create_app()
+jwt = JWTManager(app)
 
-user = User(id=0, username="test", email="test@test.com")
-user.set_password("password")
+testuser = User(id=0, username="test")
+testuser.set_password("password")
 
 release1 = Release(artist="Avett Brothers", title="Emotionalism", thumb="https://img.discogs.com/SwnFq01J1XAXArAhfvgtG6EgkH0=/fit-in/300x300/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-986527-1293716829.jpeg.jpg")
 release2 = Release(artist="Avett Brothers", title="I and Love and You", thumb="https://img.discogs.com/7XGz7VuFH-dp80PqS_M-BLe7GGA=/fit-in/300x300/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-1963341-1262735484.jpeg.jpg")
 release3 = Release(artist="Avett Brothers", title="The Second Gleam", thumb="https://img.discogs.com/7thNTBY7jzWL6Oa7QXwCssboU7k=/fit-in/300x300/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-2093811-1263645509.jpeg.jpg")
-user.releases.append(release1)
-user.releases.append(release2)
-user.releases.append(release3)
+testuser.releases.append(release1)
+testuser.releases.append(release2)
+testuser.releases.append(release3)
 listen1 = Listen(release_id=1)
 listen2 = Listen(release_id=2)
-user.listens.append(listen1)
-user.listens.append(listen2)
-db.session.add(user)
+testuser.listens.append(listen1)
+testuser.listens.append(listen2)
+db.session.add(testuser)
 db.session.commit()
+
+# Provide a method to create access tokens. The create_access_token()
+# function is used to actually generate the token, and you can return
+# it to the caller however you choose.
+@app.route('/login', methods=['POST'])
+def login():
+    if not request.is_json:
+        return jsonify({"msg": "Missing JSON in request"}), 400
+
+    username = request.json.get('username', None)
+    password = request.json.get('password', None)
+    if not username:
+        return jsonify({"msg": "Missing username parameter"}), 400
+    if not password:
+        return jsonify({"msg": "Missing password parameter"}), 400
+
+    user = User.query.filter_by(username=username).first()
+
+    if user:
+        if not user.check_password(password):
+            return jsonify({"msg": "Bad username or password"}), 401
+    else:
+        return jsonify({"msg": "Bad username"}), 401
+
+    # Identity can be any data that is json serializable
+    access_token = create_access_token(identity=username)
+    return jsonify(access_token=access_token), 200
+
+
+# Protect a view with jwt_required, which requires a valid access token
+# in the request to access.
+@app.route('/protected', methods=['GET'])
+@jwt_required
+def protected():
+    # Access the identity of the current user with get_jwt_identity
+    current_user = get_jwt_identity()
+    return jsonify(logged_in_as=current_user), 200
 
 
 @app.route('/users', methods=['GET'])
 def get_users():
     users = User.query.all()
-    user_dict = dict()
+    result = []
     for user in users:
-        user_dict[user.id] = user.to_json()
-    return user_dict
+        result.append(user.to_json())
 
+    return result
 
-@app.route('/users', methods=['POST'])
-def add_user():
-    data = request.get_json()
-    id = data['id']
-    username = data['username']
-    email = data['email']
+@app.route('/signup', methods=['POST'])
+def signup_user():
+ data = request.get_json()
 
-    user = User(id=id, username=username, email=email)
-    user.set_password("password")
-    db.session.add(user)
-    db.session.commit()
+ new_user = User(username=data['username'])
+ new_user.set_password(data['password'])
+ db.session.add(new_user)
+ db.session.commit()
+
+ return jsonify({'message': 'registered successfully'})
+#
+#
+# @app.route('/login', methods=['GET', 'POST'])
+# def login_user():
+#
+#   auth = request.authorization
+#
+#   if not auth or not auth.username or not auth.password:
+#      return make_response('could not verify', 401, {'WWW.Authentication': 'Basic realm: "login required"'})
+#
+#   user = Users.query.filter_by(name=auth.username).first()
+#
+#   if check_password(auth.password):
+#      token = jwt.encode({'public_id': user.id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
+#      return jsonify({'token' : token.decode('UTF-8')})
+#
+#   return make_response('could not verify',  401, {'WWW.Authentication': 'Basic realm: "login required"'})
 
 
 @app.route('/releases', methods=['GET'])
+@jwt_required
 def get_releases():
-    users = User.query.all()
-    user = users[0]
+    current_user = get_jwt_identity()
+    # users = User.query.all()
+    # user = users[0]
+    user = User.query.filter_by(username=current_user).first()
     releases = []
     for release in user.releases:
         releases.append(release.to_json())
@@ -78,9 +140,12 @@ def get_releases():
 
 
 @app.route('/listens', methods=['GET'])
+@jwt_required
 def get_listens():
-    users = User.query.all()
-    user = users[0]
+    # users = User.query.all()
+    # user = users[0]
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(username=current_user).first()
     listens = []
     for listen in user.listens:
         listens.append(listen.to_json())

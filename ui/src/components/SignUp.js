@@ -1,4 +1,6 @@
 import React from 'react';
+import { Redirect } from 'react-router-dom';
+import { withStyles } from "@material-ui/core/styles";
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -26,7 +28,7 @@ function Copyright() {
   );
 }
 
-const useStyles = makeStyles(theme => ({
+const useStyles = theme => ({
   '@global': {
     body: {
       backgroundColor: theme.palette.common.white,
@@ -49,12 +51,62 @@ const useStyles = makeStyles(theme => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
-}));
+});
 
-export default function SignUp() {
-  const classes = useStyles();
+class SignUp extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      username: '',
+      password: '',
+      authenticated: localStorage.getItem("token") != null && localStorage.getItem("token") != 'undefined'
+    };
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
 
-  return (
+  handleSubmit(event) {
+    fetch("/signup", {
+      method: 'post',
+      headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({"username": this.state.username, "password": this.state.password})
+  }).then(
+    fetch("/login", {
+      method: 'post',
+      headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+      body: JSON.stringify({"username": this.state.username, "password": this.state.password})
+    }).then( res => res.json())
+    .then(
+      (result) => {
+        console.log("Token: " + result["access_token"])
+        // this.props.handleToken(result["access_token"])
+        localStorage.setItem('token', result["access_token"]);
+        this.setState({
+          authenticated: true
+        })
+      }
+    )
+  )
+    event.preventDefault();
+  }
+
+
+  handleChange(event) {
+    this.setState({[event.target.name]: event.target.value});
+  }
+
+  render() {
+    const { classes } = this.props;
+    if (this.state.authenticated) {
+      return <Redirect to="/albums"/>
+    }
+    return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
@@ -64,40 +116,18 @@ export default function SignUp() {
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
-        <form className={classes.form} noValidate>
+        <form className={classes.form} noValidate action="/albums" onSubmit={this.handleSubmit}>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                autoComplete="fname"
-                name="firstName"
-                variant="outlined"
-                required
-                fullWidth
-                id="firstName"
-                label="First Name"
-                autoFocus
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                id="lastName"
-                label="Last Name"
-                name="lastName"
-                autoComplete="lname"
-              />
-            </Grid>
             <Grid item xs={12}>
               <TextField
                 variant="outlined"
                 required
                 fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
+                id="username"
+                label="Username"
+                name="username"
+                autoComplete="username"
+                onChange={this.handleChange}
               />
             </Grid>
             <Grid item xs={12}>
@@ -110,12 +140,7 @@ export default function SignUp() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <FormControlLabel
-                control={<Checkbox value="allowExtraEmails" color="primary" />}
-                label="I want to receive inspiration, marketing promotions and updates via email."
+                onChange={this.handleChange}
               />
             </Grid>
           </Grid>
@@ -143,3 +168,6 @@ export default function SignUp() {
     </Container>
   );
 }
+}
+
+export default withStyles(useStyles, { withTheme: true })(SignUp);
