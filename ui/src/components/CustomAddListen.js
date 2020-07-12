@@ -35,7 +35,9 @@ class CustomToolbarSelect extends React.Component {
     this.props.selectedRows.data.forEach(row =>
       fetch("/listens/" + this.props.displayData[row.index].data[0], {
         method: 'post',
-        body: JSON.stringify({})
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem("token")
+        }
       })
     )
     this.props.setSelectedRows([]);

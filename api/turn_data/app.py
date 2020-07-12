@@ -99,31 +99,14 @@ def get_users():
 
 @app.route('/signup', methods=['POST'])
 def signup_user():
- data = request.get_json()
+    data = request.get_json()
 
- new_user = User(username=data['username'])
- new_user.set_password(data['password'])
- db.session.add(new_user)
- db.session.commit()
+    new_user = User(username=data['username'])
+    new_user.set_password(data['password'])
+    db.session.add(new_user)
+    db.session.commit()
 
- return jsonify({'message': 'registered successfully'})
-#
-#
-# @app.route('/login', methods=['GET', 'POST'])
-# def login_user():
-#
-#   auth = request.authorization
-#
-#   if not auth or not auth.username or not auth.password:
-#      return make_response('could not verify', 401, {'WWW.Authentication': 'Basic realm: "login required"'})
-#
-#   user = Users.query.filter_by(name=auth.username).first()
-#
-#   if check_password(auth.password):
-#      token = jwt.encode({'public_id': user.id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
-#      return jsonify({'token' : token.decode('UTF-8')})
-#
-#   return make_response('could not verify',  401, {'WWW.Authentication': 'Basic realm: "login required"'})
+    return jsonify({'message': 'registered successfully'})
 
 
 @app.route('/releases', methods=['GET'])
@@ -142,8 +125,6 @@ def get_releases():
 @app.route('/listens', methods=['GET'])
 @jwt_required
 def get_listens():
-    # users = User.query.all()
-    # user = users[0]
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
     listens = []
@@ -153,9 +134,10 @@ def get_listens():
 
 
 @app.route('/listens/<int:release_id>', methods=['POST'])
+@jwt_required
 def listen_now(release_id):
-    users = User.query.all()
-    user = users[0]
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(username=current_user).first()
     app.logger.info(release_id)
     listen = Listen(dtg=datetime.now(), release_id=release_id)
     user.listens.append(listen)
