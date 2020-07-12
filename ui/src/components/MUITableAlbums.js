@@ -64,6 +64,7 @@ const data = [
 const options = {
   print: false,
   download: false,
+  responsive: "standard",
   customToolbarSelect: (selectedRows, displayData, setSelectedRows) => (
     <CustomAddListen selectedRows={selectedRows} displayData={displayData} setSelectedRows={setSelectedRows} />
   ),
