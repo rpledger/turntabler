@@ -1,16 +1,9 @@
 # Turn Tabler
 
 ## Build Instructions
-Build api docker
+Build api and ui dockers
 ```
-cd api
-docker build -t turn_data:latest .
-```
-
-Build ui docker
-```
-cd ui
-docker build -t turn_react:latest .
+./build.sh
 ```
 
 ## Run Instructions
