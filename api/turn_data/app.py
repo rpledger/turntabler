@@ -11,6 +11,7 @@ from flask_jwt_extended import (
 
 from turn_data.models import db, User, Release, Listen
 from turn_data.config import Config
+from turn_data.discogs import Discogs
 
 
 POSTGRES_URL = "db:5432"
@@ -18,6 +19,15 @@ POSTGRES_USER = "postgres"
 POSTGRES_PW = "password"
 POSTGRES_DB = "postgres"
 DB_URL = 'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(user=POSTGRES_USER,pw=POSTGRES_PW,url=POSTGRES_URL,db=POSTGRES_DB)
+
+
+def init_test_user():
+    testuser = User.query.get(0)
+    if testuser is None:
+        testuser = User(id=0, username="test")
+        testuser.set_password("password")
+        db.session.add(testuser)
+        db.session.commit()
 
 
 def create_app():
@@ -28,27 +38,13 @@ def create_app():
     app.app_context().push()
     db.init_app(app)
     db.create_all()
+    init_test_user()
     return app
 
 
 app = create_app()
 jwt = JWTManager(app)
-
-testuser = User(id=0, username="test")
-testuser.set_password("password")
-
-release1 = Release(artist="Avett Brothers", title="Emotionalism", thumb="https://img.discogs.com/SwnFq01J1XAXArAhfvgtG6EgkH0=/fit-in/300x300/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-986527-1293716829.jpeg.jpg")
-release2 = Release(artist="Avett Brothers", title="I and Love and You", thumb="https://img.discogs.com/7XGz7VuFH-dp80PqS_M-BLe7GGA=/fit-in/300x300/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-1963341-1262735484.jpeg.jpg")
-release3 = Release(artist="Avett Brothers", title="The Second Gleam", thumb="https://img.discogs.com/7thNTBY7jzWL6Oa7QXwCssboU7k=/fit-in/300x300/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-2093811-1263645509.jpeg.jpg")
-testuser.releases.append(release1)
-testuser.releases.append(release2)
-testuser.releases.append(release3)
-listen1 = Listen(release_id=1)
-listen2 = Listen(release_id=2)
-testuser.listens.append(listen1)
-testuser.listens.append(listen2)
-db.session.add(testuser)
-db.session.commit()
+discogs = Discogs()
 
 # Provide a method to create access tokens. The create_access_token()
 # function is used to actually generate the token, and you can return
@@ -78,6 +74,30 @@ def login():
     return jsonify(access_token=access_token), 200
 
 
+@app.route('/discogsUser', methods=['GET'])
+def get_discogs_user():
+    me = discogs.identity()
+    user = User.query.get(0)
+
+    collections = me.collection_folders
+    added_count = 0
+    for release in collections[0].releases:
+        r = release.release
+
+        if not any(rel.id == r.id for rel in user.releases):
+            release = Release(id=r.id,
+                              artist=r.artists[0].name,
+                              title=r.title,
+                              thumb=r.thumb
+                              )
+
+            user.releases.append(release)
+            db.session.add(user)
+            db.session.commit()
+            added_count += 1
+
+    return jsonify({"msg": "Added " + str(added_count) + " releases to " + user.username}), 200
+
 # Protect a view with jwt_required, which requires a valid access token
 # in the request to access.
 @app.route('/protected', methods=['GET'])
@@ -96,6 +116,7 @@ def get_users():
         result.append(user.to_json())
 
     return result
+
 
 @app.route('/signup', methods=['POST'])
 def signup_user():
@@ -144,3 +165,4 @@ def listen_now(release_id):
     db.session.add(user)
     db.session.commit()
     return jsonify({'listen': listen.to_json()}), 201
+

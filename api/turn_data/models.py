@@ -6,8 +6,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 db = SQLAlchemy()
 
 user_release = db.Table('user_release',
-    db.Column('release_id', db.Integer, db.ForeignKey('release.id'), primary_key=True),
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    db.Column('release_id', db.Integer, db.ForeignKey('release.id', ondelete="CASCADE"), primary_key=True),
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id', ondelete="CASCADE"), primary_key=True)
 )
 
 
@@ -18,7 +18,7 @@ class User(db.Model):
     password = db.Column(db.String(128))
 
     releases = db.relationship('Release', secondary=user_release, lazy='subquery',
-                           backref=db.backref('users', lazy=True))
+                           backref=db.backref('users', lazy=True), cascade="all, delete")
 
     def __repr__(self):
         return '<User %r>' % self.username
