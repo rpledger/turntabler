@@ -12,6 +12,7 @@ from flask_jwt_extended import (
 from turn_data.models import db, User, Release, Listen
 from turn_data.config import Config
 from turn_data.discogs import Discogs
+from discogs_client.exceptions import HTTPError
 
 
 POSTGRES_URL = "db:5432"
@@ -74,9 +75,25 @@ def login():
     return jsonify(access_token=access_token), 200
 
 
-@app.route('/discogsUser', methods=['GET'])
+@app.route('/discogs/url', methods=['GET'])
+def get_discogs_url():
+    return jsonify({"url": discogs.get_url()}), 200
+
+
+@app.route('/discogs/login', methods=['POST'])
+def login_discogs_user():
+    data = request.get_json()
+    oauth_verifier = data['code']
+    try:
+        discogs.set_access_token(oauth_verifier)
+    except HTTPError as http_error:
+        return jsonify({"msg": "Discogs authorization failed"}), 401
+    return jsonify({"msg": "Discogs authorization successful"}), 200
+
+
+@app.route('/discogs/user', methods=['GET'])
 def get_discogs_user():
-    me = discogs.identity()
+    me = discogs.get_identity()
     user = User.query.get(0)
 
     collections = me.collection_folders
