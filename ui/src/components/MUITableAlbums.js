@@ -81,11 +81,12 @@ class MUITableAlbums extends React.Component {
   }
 
   componentDidMount() {
-    fetch("/releases", {
+    fetch("/api/releases", {
       method: "get",
-      headers: {
-      'Authorization': 'Bearer ' + localStorage.getItem("token")
-    }})
+      // headers: {
+      // 'Authorization': 'Bearer ' + localStorage.getItem("token")
+    // }
+  })
     .then(res => res.json())
     .then(
       (result) => {

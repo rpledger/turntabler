@@ -25,6 +25,9 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Link from '@material-ui/core/Link';
 import { Redirect } from 'react-router-dom';
+import Cookies from 'universal-cookie';
+
+const cookies = new Cookies();
 
 
 const useStyles = makeStyles(theme => ({
@@ -68,13 +71,19 @@ function MenuAppBar() {
   };
 
   function removeToken() {
+    fetch('/token/remove', {
+    method: 'post',
+    body: JSON.stringify({})
+  })
+
+
     localStorage.removeItem("token");
     window.location.reload(false);
   }
 
 
   function signInOrOut() {
-  if (localStorage.getItem("token") == null || localStorage.getItem("token") == "undefined") {
+  if (!cookies.get("csrf_access_token")) {
     return (<div>
       <ListItem button key="Sign In" href="/signIn">
         <ListItemIcon><ExitToAppIcon /></ListItemIcon>

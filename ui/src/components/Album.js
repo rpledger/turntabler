@@ -30,7 +30,7 @@ class Album extends React.Component {
 
   listenDialog = () => {
     console.log(this.props)
-    fetch('/listens/' + this.props.id, {
+    fetch('/api/listens/' + this.props.id, {
     method: 'post',
     body: JSON.stringify({})
   })
