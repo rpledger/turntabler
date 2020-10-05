@@ -66,7 +66,7 @@ class SignUp extends React.Component {
   }
 
   handleSubmit(event) {
-    fetch("/signup", {
+    fetch("/api/signup", {
       method: 'post',
       headers: {
       'Accept': 'application/json',
