@@ -72,7 +72,7 @@ class SignIn extends React.Component {
   }
 
   handleSubmit(event) {
-    fetch("/login", {
+    fetch("/token/auth", {
       method: 'post',
       headers: {
       'Accept': 'application/json',
@@ -82,9 +82,9 @@ class SignIn extends React.Component {
     }).then( res => res.json())
     .then(
       (result) => {
-        console.log("Token: " + result["access_token"])
+        // console.log("Token: " + result["access_token"])
         // this.props.handleToken(result["access_token"])
-        localStorage.setItem('token', result["access_token"]);
+        // localStorage.setItem('token', result["access_token"]);
         this.setState({
           authenticated: true
         })

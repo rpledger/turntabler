@@ -6,6 +6,9 @@ import IndeterminateCheckBoxIcon from "@material-ui/icons/IndeterminateCheckBox"
 import BlockIcon from "@material-ui/icons/Block";
 import RadioIcon from '@material-ui/icons/Radio';
 import { withStyles } from "@material-ui/core/styles";
+import Cookies from 'universal-cookie';
+
+const cookies = new Cookies();
 
 const defaultToolbarSelectStyles = {
   iconButton: {
@@ -33,10 +36,10 @@ class CustomToolbarSelect extends React.Component {
 
   handleClickDeselectAll = () => {
     this.props.selectedRows.data.forEach(row =>
-      fetch("/listens/" + this.props.displayData[row.index].data[0], {
+      fetch("/api/listens/" + this.props.displayData[row.index].data[0], {
         method: 'post',
         headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem("token")
+          'X-Csrf-Token': cookies.get('csrf_access_token')
         }
       })
     )

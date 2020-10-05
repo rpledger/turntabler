@@ -12,7 +12,7 @@ class AlbumTable extends React.Component {
   }
 
   componentDidMount() {
-    fetch("/releases")
+    fetch("/api/releases")
     .then(res => res.json())
     .then(
       (result) => {

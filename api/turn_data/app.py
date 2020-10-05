@@ -6,7 +6,9 @@ from flask import request
 
 from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
-    get_jwt_identity
+    jwt_refresh_token_required, create_refresh_token,
+    get_jwt_identity, set_access_cookies,
+    set_refresh_cookies, unset_jwt_cookies
 )
 
 from turn_data.models import db, User, Release, Listen
@@ -35,6 +37,22 @@ def create_app():
     app.config.from_object(Config)
     app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    # Configure application to store JWTs in cookies
+    app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+    # Only allow JWT cookies to be sent over https. In production, this
+    # should likely be True
+    app.config['JWT_COOKIE_SECURE'] = False
+    # Set the cookie paths, so that you are only sending your access token
+    # cookie to the access endpoints, and only sending your refresh token
+    # to the refresh endpoint. Technically this is optional, but it is in
+    # your best interest to not send additional cookies in the request if
+    # they aren't needed.
+    app.config['JWT_ACCESS_COOKIE_PATH'] = '/api/'
+    app.config['JWT_REFRESH_COOKIE_PATH'] = '/token/refresh'
+    # Enable csrf double submit protection. See this for a thorough
+    # explanation: http://www.redotheweb.com/2015/11/09/api-security.html
+    app.config['JWT_COOKIE_CSRF_PROTECT'] = True
+    app.config['JWT_CSRF_CHECK_FORM'] = True
     app.app_context().push()
     db.init_app(app)
     db.create_all()
@@ -46,35 +64,90 @@ app = create_app()
 jwt = JWTManager(app)
 discogs = Discogs()
 
+# With JWT_COOKIE_CSRF_PROTECT set to True, set_access_cookies() and
+# set_refresh_cookies() will now also set the non-httponly CSRF cookies
+# as well
+@app.route('/token/auth', methods=['POST'])
+def token_login():
+    username = request.json.get('username', None)
+    password = request.json.get('password', None)
+    if username != 'test' or password != 'password':
+        return jsonify({'login': False}), 401
+
+    # Create the tokens we will be sending back to the user
+    access_token = create_access_token(identity=username)
+    refresh_token = create_refresh_token(identity=username)
+
+    # Set the JWTs and the CSRF double submit protection cookies
+    # in this response
+    resp = jsonify({'login': True})
+    set_access_cookies(resp, access_token)
+    set_refresh_cookies(resp, refresh_token)
+    return resp, 200
+
+
+@app.route('/token/refresh', methods=['POST'])
+@jwt_refresh_token_required
+def token_refresh():
+    # Create the new access token
+    current_user = get_jwt_identity()
+    access_token = create_access_token(identity=current_user)
+
+    # Set the access JWT and CSRF double submit protection cookies
+    # in this response
+    resp = jsonify({'refresh': True})
+    set_access_cookies(resp, access_token)
+    return resp, 200
+
+
+# Because the JWTs are stored in an httponly cookie now, we cannot
+# log the user out by simply deleting the cookie in the frontend.
+# We need the backend to send us a response to delete the cookies
+# in order to logout. unset_jwt_cookies is a helper function to
+# do just that.
+@app.route('/token/remove', methods=['POST'])
+def token_logout():
+    resp = jsonify({'logout': True})
+    unset_jwt_cookies(resp)
+    return resp, 200
+
+
+@app.route('/api/example', methods=['GET'])
+@jwt_required
+def token_protected():
+    username = get_jwt_identity()
+    return jsonify({'hello': 'from {}'.format(username)}), 200
+
+
 # Provide a method to create access tokens. The create_access_token()
 # function is used to actually generate the token, and you can return
 # it to the caller however you choose.
-@app.route('/login', methods=['POST'])
-def login():
-    if not request.is_json:
-        return jsonify({"msg": "Missing JSON in request"}), 400
+# @app.route('/login', methods=['POST'])
+# def login():
+#     if not request.is_json:
+#         return jsonify({"msg": "Missing JSON in request"}), 400
+#
+#     username = request.json.get('username', None)
+#     password = request.json.get('password', None)
+#     if not username:
+#         return jsonify({"msg": "Missing username parameter"}), 400
+#     if not password:
+#         return jsonify({"msg": "Missing password parameter"}), 400
+#
+#     user = User.query.filter_by(username=username).first()
+#
+#     if user:
+#         if not user.check_password(password):
+#             return jsonify({"msg": "Bad username or password"}), 401
+#     else:
+#         return jsonify({"msg": "Bad username"}), 401
+#
+#     # Identity can be any data that is json serializable
+#     access_token = create_access_token(identity=username)
+#     return jsonify(access_token=access_token), 200
 
-    username = request.json.get('username', None)
-    password = request.json.get('password', None)
-    if not username:
-        return jsonify({"msg": "Missing username parameter"}), 400
-    if not password:
-        return jsonify({"msg": "Missing password parameter"}), 400
 
-    user = User.query.filter_by(username=username).first()
-
-    if user:
-        if not user.check_password(password):
-            return jsonify({"msg": "Bad username or password"}), 401
-    else:
-        return jsonify({"msg": "Bad username"}), 401
-
-    # Identity can be any data that is json serializable
-    access_token = create_access_token(identity=username)
-    return jsonify(access_token=access_token), 200
-
-
-@app.route('/discogsUser', methods=['GET'])
+@app.route('/api/discogs/user', methods=['GET'])
 def get_discogs_user():
     me = discogs.identity()
     user = User.query.get(0)
@@ -100,7 +173,7 @@ def get_discogs_user():
 
 # Protect a view with jwt_required, which requires a valid access token
 # in the request to access.
-@app.route('/protected', methods=['GET'])
+@app.route('/api/protected', methods=['GET'])
 @jwt_required
 def protected():
     # Access the identity of the current user with get_jwt_identity
@@ -108,7 +181,7 @@ def protected():
     return jsonify(logged_in_as=current_user), 200
 
 
-@app.route('/users', methods=['GET'])
+@app.route('/api/users', methods=['GET'])
 def get_users():
     users = User.query.all()
     result = []
@@ -118,7 +191,7 @@ def get_users():
     return result
 
 
-@app.route('/signup', methods=['POST'])
+@app.route('/api/signup', methods=['POST'])
 def signup_user():
     data = request.get_json()
 
@@ -130,7 +203,7 @@ def signup_user():
     return jsonify({'message': 'registered successfully'})
 
 
-@app.route('/releases', methods=['GET'])
+@app.route('/api/releases', methods=['GET'])
 @jwt_required
 def get_releases():
     current_user = get_jwt_identity()
@@ -143,7 +216,7 @@ def get_releases():
     return jsonify(releases)
 
 
-@app.route('/listens', methods=['GET'])
+@app.route('/api/listens', methods=['GET'])
 @jwt_required
 def get_listens():
     current_user = get_jwt_identity()
@@ -154,7 +227,7 @@ def get_listens():
     return jsonify(listens)
 
 
-@app.route('/listens/<int:release_id>', methods=['POST'])
+@app.route('/api/listens/<int:release_id>', methods=['POST'])
 @jwt_required
 def listen_now(release_id):
     current_user = get_jwt_identity()

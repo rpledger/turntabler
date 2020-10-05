@@ -55,10 +55,10 @@ class AlbumList extends React.Component {
   }
 
   componentDidMount() {
-    fetch("/releases", {
-      headers: {
-      'Authorization': 'Bearer'
-    },
+    fetch("/api/releases", {
+    //   headers: {
+    //   'Authorization': 'Bearer'
+    // },
     })
     .then(res => res.json())
     .then(
