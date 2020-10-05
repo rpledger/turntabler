@@ -87,9 +87,6 @@ def token_login():
     else:
         return jsonify({"msg": "Bad username"}), 401
 
-    if username != 'test' or password != 'password':
-        return jsonify({'login': False}), 401
-
     # Create the tokens we will be sending back to the user
     access_token = create_access_token(identity=username)
     refresh_token = create_refresh_token(identity=username)
