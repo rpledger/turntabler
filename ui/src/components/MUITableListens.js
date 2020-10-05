@@ -68,11 +68,12 @@ class MUITableListens extends React.Component {
   }
 
   componentDidMount() {
-    fetch("/listens", {
+    fetch("/api/listens", {
       method: "get",
-      headers: {
-      'Authorization': 'Bearer ' + localStorage.getItem("token")
-    }})
+    //   headers: {
+    //   'Authorization': 'Bearer ' + localStorage.getItem("token")
+    // }
+  })
     .then(res => res.json())
     .then(
       (result) => {

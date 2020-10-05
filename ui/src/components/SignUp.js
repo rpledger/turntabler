@@ -66,7 +66,7 @@ class SignUp extends React.Component {
   }
 
   handleSubmit(event) {
-    fetch("/signup", {
+    fetch("/api/signup", {
       method: 'post',
       headers: {
       'Accept': 'application/json',
@@ -74,7 +74,7 @@ class SignUp extends React.Component {
     },
     body: JSON.stringify({"username": this.state.username, "password": this.state.password})
   }).then(
-    fetch("/login", {
+    fetch("/token/auth", {
       method: 'post',
       headers: {
       'Accept': 'application/json',
@@ -84,9 +84,9 @@ class SignUp extends React.Component {
     }).then( res => res.json())
     .then(
       (result) => {
-        console.log("Token: " + result["access_token"])
+        // console.log("Token: " + result["access_token"])
         // this.props.handleToken(result["access_token"])
-        localStorage.setItem('token', result["access_token"]);
+        // localStorage.setItem('token', result["access_token"]);
         this.setState({
           authenticated: true
         })
