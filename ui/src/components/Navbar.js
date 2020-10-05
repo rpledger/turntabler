@@ -84,7 +84,6 @@ function MenuAppBar() {
 
   function signInOrOut() {
   if (!cookies.get("csrf_access_token")) {
-    console.log("No cookie")
     return (<div>
       <ListItem button key="Sign In" href="/signIn">
         <ListItemIcon><ExitToAppIcon /></ListItemIcon>
@@ -92,7 +91,6 @@ function MenuAppBar() {
       </ListItem>
     </div>)
   }
-  console.log("Cookie")
   return (<div>
     <ListItem button key="Sign Out" onClick={removeToken}>
       <ListItemIcon><ExitToAppIcon /></ListItemIcon>
