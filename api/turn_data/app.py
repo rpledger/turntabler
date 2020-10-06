@@ -4,6 +4,8 @@ from flask import Flask, redirect, url_for
 from flask import jsonify
 from flask import request
 
+from cryptography.fernet import Fernet
+
 from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
     jwt_refresh_token_required, create_refresh_token,
@@ -63,6 +65,19 @@ def create_app():
 
 app = create_app()
 jwt = JWTManager(app)
+
+
+def encrypt(msg):
+    encoded = msg.encode()
+    f = Fernet(Config.SECRET_KEY)
+    return f.encrypt(encoded)
+
+
+def decrypt(msg):
+    f = Fernet(Config.SECRET_KEY)
+    return f.decrypt(msg).decode()
+
+
 
 # With JWT_COOKIE_CSRF_PROTECT set to True, set_access_cookies() and
 # set_refresh_cookies() will now also set the non-httponly CSRF cookies
@@ -139,10 +154,9 @@ def get_discogs_url():
     user = User.query.filter_by(username=current_user).first()
     discogs = Discogs()
 
-    app.logger.info("GET URL")
     access_token, access_secret, url = discogs.get_url()
-    user.access_secret = access_secret
-    user.access_token = access_token
+    user.access_secret = encrypt(access_secret)
+    user.access_token = encrypt(access_token)
     db.session.add(user)
     db.session.commit()
 
@@ -152,29 +166,25 @@ def get_discogs_url():
 @app.route('/api/discogs/login', methods=['GET'])
 @jwt_required
 def login_discogs_user():
-    # data = request.get_json()
-    # oauth_verifier = data['code']
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
 
-    app.logger.info("LOGIN")
-
-    discogs = Discogs(app.logger, token=user.access_token, secret=user.access_secret)
-    app.logger.info("User from db token: " + user.access_token + " , secret: " + user.access_secret)
-    app.logger.info("Discogs from obj token: " + discogs.token + " , secret: " + discogs.secret)
     oauth_verifier = request.args.get('oauth_verifier')
-    app.logger.info("verifier: " + oauth_verifier)
+
+    token = decrypt(user.access_token)
+    secret = decrypt(user.access_secret)
+
+    discogs = Discogs(token=token, secret=secret)
     try:
         access_token, access_secret = discogs.set_access_token(oauth_verifier)
-        user.access_secret = access_secret
-        user.access_token = access_token
+        user.access_secret = encrypt(access_secret)
+        user.access_token = encrypt(access_token)
         db.session.add(user)
         db.session.commit()
-        get_collection(discogs)
-        # return redirect(url_for('get_discogs_user'))
+        get_collection(discogs, user)
     except HTTPError as http_error:
         return jsonify({"msg": "Discogs authorization failed"}), 401
-    # return jsonify({"msg": "Discogs authorization successful"}), 200
+    return jsonify({"msg": "Discogs authorization successful"}), 200
 
 
 @app.route('/api/discogs/user', methods=['GET'])
@@ -183,13 +193,16 @@ def get_discogs_user():
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
 
-    discogs = Discogs(app.logger, token=user.access_token, secret=user.access_secret)
-    added_count = get_collection(discogs)
+    token = decrypt(user.access_token)
+    secret = decrypt(user.access_secret)
+
+    discogs = Discogs(token=token, secret=secret)
+    added_count = get_collection(discogs, user)
 
     return jsonify({"msg": "Added " + str(added_count) + " releases to " + user.username}), 200
 
 
-def get_collection(discogs):
+def get_collection(discogs, user):
     me = discogs.get_identity()
     collections = me.collection_folders
     added_count = 0

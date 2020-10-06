@@ -5,7 +5,7 @@ from turn_data.config import Config
 
 class Discogs:
 
-    def __init__(self, logger=None, token=None, secret=None):
+    def __init__(self, token=None, secret=None):
         self.token = token
         self.secret = secret
         self.url = None
@@ -16,7 +16,6 @@ class Discogs:
         # Instantiate discogs_client obj
 
         if token and secret:
-            logger.info("inside discogs token: " + token + " secret: " + secret)
             self.discogsclient = discogs_client.Client(user_agent, token=token, secret=secret, consumer_key=Config.DISCOGS_CONSUMER_KEY, consumer_secret=Config.DISCOGS_CONSUMER_SECRET)
         else:
             self.discogsclient = discogs_client.Client(user_agent, consumer_key=Config.DISCOGS_CONSUMER_KEY, consumer_secret=Config.DISCOGS_CONSUMER_SECRET)
