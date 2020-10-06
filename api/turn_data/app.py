@@ -63,7 +63,6 @@ def create_app():
 
 app = create_app()
 jwt = JWTManager(app)
-discogs = Discogs()
 
 # With JWT_COOKIE_CSRF_PROTECT set to True, set_access_cookies() and
 # set_refresh_cookies() will now also set the non-httponly CSRF cookies
@@ -134,26 +133,64 @@ def token_protected():
 
 
 @app.route('/api/discogs/url', methods=['GET'])
+@jwt_required
 def get_discogs_url():
-    return jsonify({"url": discogs.get_url()}), 200
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(username=current_user).first()
+    discogs = Discogs()
+
+    app.logger.info("GET URL")
+    access_token, access_secret, url = discogs.get_url()
+    user.access_secret = access_secret
+    user.access_token = access_token
+    db.session.add(user)
+    db.session.commit()
+
+    return jsonify({"url": url}), 200
 
 
-@app.route('/api/discogs/login', methods=['POST'])
+@app.route('/api/discogs/login', methods=['GET'])
+@jwt_required
 def login_discogs_user():
-    data = request.get_json()
-    oauth_verifier = data['code']
+    # data = request.get_json()
+    # oauth_verifier = data['code']
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(username=current_user).first()
+
+    app.logger.info("LOGIN")
+
+    discogs = Discogs(app.logger, token=user.access_token, secret=user.access_secret)
+    app.logger.info("User from db token: " + user.access_token + " , secret: " + user.access_secret)
+    app.logger.info("Discogs from obj token: " + discogs.token + " , secret: " + discogs.secret)
+    oauth_verifier = request.args.get('oauth_verifier')
+    app.logger.info("verifier: " + oauth_verifier)
     try:
-        discogs.set_access_token(oauth_verifier)
+        access_token, access_secret = discogs.set_access_token(oauth_verifier)
+        user.access_secret = access_secret
+        user.access_token = access_token
+        db.session.add(user)
+        db.session.commit()
+        get_collection(discogs)
+        # return redirect(url_for('get_discogs_user'))
     except HTTPError as http_error:
         return jsonify({"msg": "Discogs authorization failed"}), 401
-    return jsonify({"msg": "Discogs authorization successful"}), 200
+    # return jsonify({"msg": "Discogs authorization successful"}), 200
 
 
 @app.route('/api/discogs/user', methods=['GET'])
+@jwt_required
 def get_discogs_user():
-    me = discogs.get_identity()
-    user = User.query.get(0)
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(username=current_user).first()
 
+    discogs = Discogs(app.logger, token=user.access_token, secret=user.access_secret)
+    added_count = get_collection(discogs)
+
+    return jsonify({"msg": "Added " + str(added_count) + " releases to " + user.username}), 200
+
+
+def get_collection(discogs):
+    me = discogs.get_identity()
     collections = me.collection_folders
     added_count = 0
     for release in collections[0].releases:
@@ -170,8 +207,7 @@ def get_discogs_user():
             db.session.add(user)
             db.session.commit()
             added_count += 1
-
-    return jsonify({"msg": "Added " + str(added_count) + " releases to " + user.username}), 200
+    return added_count
 
 # Protect a view with jwt_required, which requires a valid access token
 # in the request to access.
