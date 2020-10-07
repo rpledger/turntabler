@@ -16,6 +16,8 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     #email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(128))
+    access_token = db.Column(db.LargeBinary, nullable=True)
+    access_secret = db.Column(db.LargeBinary, nullable=True)
 
     releases = db.relationship('Release', secondary=user_release, lazy='subquery',
                            backref=db.backref('users', lazy=True), cascade="all, delete")

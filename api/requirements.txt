@@ -8,3 +8,4 @@ sqlalchemy_utils
 requests
 psycopg2-binary
 python3-discogs-client
+cryptography

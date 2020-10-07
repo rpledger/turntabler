@@ -18,6 +18,9 @@ services:
       - 4000:5000
     environment:
       DISCOGS_USER_TOKEN: ${DISCOGS_USER_TOKEN}
+      DISCOGS_CONSUMER_KEY: ${DISCOGS_CONSUMER_KEY}
+      DISCOGS_CONSUMER_SECRET: ${DISCOGS_CONSUMER_SECRET}
+      SECRET_KEY: ${SECRET_KEY}
     depends_on:
       - db
 

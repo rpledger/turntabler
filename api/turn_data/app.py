@@ -4,6 +4,8 @@ from flask import Flask, redirect, url_for
 from flask import jsonify
 from flask import request
 
+from cryptography.fernet import Fernet
+
 from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
     jwt_refresh_token_required, create_refresh_token,
@@ -14,6 +16,7 @@ from flask_jwt_extended import (
 from turn_data.models import db, User, Release, Listen
 from turn_data.config import Config
 from turn_data.discogs import Discogs
+from discogs_client.exceptions import HTTPError
 
 
 POSTGRES_URL = "db:5432"
@@ -62,7 +65,19 @@ def create_app():
 
 app = create_app()
 jwt = JWTManager(app)
-discogs = Discogs()
+
+
+def encrypt(msg):
+    encoded = msg.encode()
+    f = Fernet(Config.SECRET_KEY)
+    return f.encrypt(encoded)
+
+
+def decrypt(msg):
+    f = Fernet(Config.SECRET_KEY)
+    return f.decrypt(msg).decode()
+
+
 
 # With JWT_COOKIE_CSRF_PROTECT set to True, set_access_cookies() and
 # set_refresh_cookies() will now also set the non-httponly CSRF cookies
@@ -132,39 +147,63 @@ def token_protected():
     return jsonify({'hello': 'from {}'.format(username)}), 200
 
 
-# Provide a method to create access tokens. The create_access_token()
-# function is used to actually generate the token, and you can return
-# it to the caller however you choose.
-# @app.route('/login', methods=['POST'])
-# def login():
-#     if not request.is_json:
-#         return jsonify({"msg": "Missing JSON in request"}), 400
-#
-#     username = request.json.get('username', None)
-#     password = request.json.get('password', None)
-#     if not username:
-#         return jsonify({"msg": "Missing username parameter"}), 400
-#     if not password:
-#         return jsonify({"msg": "Missing password parameter"}), 400
-#
-#     user = User.query.filter_by(username=username).first()
-#
-#     if user:
-#         if not user.check_password(password):
-#             return jsonify({"msg": "Bad username or password"}), 401
-#     else:
-#         return jsonify({"msg": "Bad username"}), 401
-#
-#     # Identity can be any data that is json serializable
-#     access_token = create_access_token(identity=username)
-#     return jsonify(access_token=access_token), 200
+@app.route('/api/discogs/url', methods=['GET'])
+@jwt_required
+def get_discogs_url():
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(username=current_user).first()
+    discogs = Discogs()
+
+    access_token, access_secret, url = discogs.get_url()
+    user.access_secret = encrypt(access_secret)
+    user.access_token = encrypt(access_token)
+    db.session.add(user)
+    db.session.commit()
+
+    return jsonify({"url": url}), 200
+
+
+@app.route('/api/discogs/login', methods=['GET'])
+@jwt_required
+def login_discogs_user():
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(username=current_user).first()
+
+    oauth_verifier = request.args.get('oauth_verifier')
+
+    token = decrypt(user.access_token)
+    secret = decrypt(user.access_secret)
+
+    discogs = Discogs(token=token, secret=secret)
+    try:
+        access_token, access_secret = discogs.set_access_token(oauth_verifier)
+        user.access_secret = encrypt(access_secret)
+        user.access_token = encrypt(access_token)
+        db.session.add(user)
+        db.session.commit()
+        get_collection(discogs, user)
+    except HTTPError as http_error:
+        return jsonify({"msg": "Discogs authorization failed"}), 401
+    return jsonify({"msg": "Discogs authorization successful"}), 200
 
 
 @app.route('/api/discogs/user', methods=['GET'])
+@jwt_required
 def get_discogs_user():
-    me = discogs.identity()
-    user = User.query.get(0)
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(username=current_user).first()
 
+    token = decrypt(user.access_token)
+    secret = decrypt(user.access_secret)
+
+    discogs = Discogs(token=token, secret=secret)
+    added_count = get_collection(discogs, user)
+
+    return jsonify({"msg": "Added " + str(added_count) + " releases to " + user.username}), 200
+
+
+def get_collection(discogs, user):
+    me = discogs.get_identity()
     collections = me.collection_folders
     added_count = 0
     for release in collections[0].releases:
@@ -181,8 +220,7 @@ def get_discogs_user():
             db.session.add(user)
             db.session.commit()
             added_count += 1
-
-    return jsonify({"msg": "Added " + str(added_count) + " releases to " + user.username}), 200
+    return added_count
 
 # Protect a view with jwt_required, which requires a valid access token
 # in the request to access.
