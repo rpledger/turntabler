@@ -1,33 +1,12 @@
 // Dashboard.js
 import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
+import Button from '@material-ui/core/Button';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 
-
-var tileData = [
-  {
-    img: "https://img.discogs.com/SwnFq01J1XAXArAhfvgtG6EgkH0=/fit-in/300x300/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-986527-1293716829.jpeg.jpg",
-    title: "Emotionalism"
-  },
-  {
-    img: "https://img.discogs.com/7XGz7VuFH-dp80PqS_M-BLe7GGA=/fit-in/300x300/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-1963341-1262735484.jpeg.jpg",
-    title: "I and Love and You"
-  },
-  {
-    img: "https://img.discogs.com/7thNTBY7jzWL6Oa7QXwCssboU7k=/fit-in/300x300/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-2093811-1263645509.jpeg.jpg",
-    title: "The Second Gleam"
-  },
-  {
-    img: "https://img.discogs.com/7thNTBY7jzWL6Oa7QXwCssboU7k=/fit-in/300x300/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-2093811-1263645509.jpeg.jpg",
-    title: "The Second Gleam"
-  },
-  {
-    img: "https://img.discogs.com/7thNTBY7jzWL6Oa7QXwCssboU7k=/fit-in/300x300/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-2093811-1263645509.jpeg.jpg",
-    title: "The Second Gleam"
-  }
-]
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -46,24 +25,67 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function Dashboard() {
-  const classes = useStyles();
-   const { classes, currentUser, images, width } = this.props;
+class Dashboard extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      error: null,
+      discogsAuthenticated: false,
+      discogsUsername: '',
+    };
+    // this.handleChange = this.handleChange.bind(this);
+    // this.handleSubmit = this.handleSubmit.bind(this);
+  }
 
-  let columns = width === 'xs' || width === 'sm'  ? 1 : 2;
+  componentDidMount() {
+    fetch("/api/discogs/user", {
+      method: "get",
+    })
+    .then(res => res.json())
+    .then(
+      (result) => {
+        if (result["msg"]) {
+          this.setState({error: result["msg"]})
+        } else if (result["discogsUsername"]) {
+          this.setState({
+            discogsAuthenticated: true,
+            discogsUsername: result["discogsUsername"]
+          })
+        }
+      }
+    )
+  }
 
+  render(){
+    if (this.state.discogsAuthenticated){
+      return <div><h4>Hello, {this.state.discogsUsername}</h4></div>
+    } else {
+      return(
+        <div>
+          <Button variant="contained" color="secondary">
+            Discogs Login
+          </Button>
+        </div>
+      )
+    }
 
-  return (
-    <div className={classes.root}>
-      <GridList spacing={5} cellHeight={200} className={classes.gridList} cols={columns} >
-        {tileData.map(tile => (
-          <GridListTile key={tile.img}>
-            <img src={tile.img} alt={tile.title} />
-          </GridListTile>
-        ))}
-      </GridList>
-    </div>
-  );
+  }
+
+  // render() {
+  //   const { error, discogsAuthenticated, discogsUsername } = this.state;
+  //   if (error) {
+  //     return <Redirect to="/signIn" />; //<div>Error: {error.message}</div>;
+  //   } else if (!discogsAuthenticated) {
+  //     return <div>Not Authenticated</div>;
+  //   } else {
+  //     return(
+  //       <div>
+  //       Hello, {discogsUsername}
+  //       </div>
+  //     )
+  //   }
+  // }
 }
 
-export default Dashboard;
+// export default Dashboard;
+export default withStyles(useStyles, { withTheme: true })(Dashboard);

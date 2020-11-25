@@ -187,9 +187,9 @@ def login_discogs_user():
     return jsonify({"msg": "Discogs authorization successful"}), 200
 
 
-@app.route('/api/discogs/user', methods=['GET'])
+@app.route('/api/discogs/refresh', methods=['GET'])
 @jwt_required
-def get_discogs_user():
+def get_discogs_refresh():
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
 
@@ -200,6 +200,22 @@ def get_discogs_user():
     added_count = get_collection(discogs, user)
 
     return jsonify({"msg": "Added " + str(added_count) + " releases to " + user.username}), 200
+
+
+@app.route('/api/discogs/user', methods=['GET'])
+@jwt_required
+def get_discogs_user():
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(username=current_user).first()
+
+    if user.access_token and user.access_secret:
+        token = decrypt(user.access_token)
+        secret = decrypt(user.access_secret)
+        discogs = Discogs(token=token, secret=secret)
+        discogs_user = discogs.get_identity()
+        return jsonify({"discogsUsername": discogs_user.username}), 200
+    else:
+        return jsonify({"msg": "No Discogs credentials"}), 401
 
 
 def get_collection(discogs, user):
