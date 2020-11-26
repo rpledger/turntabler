@@ -103,9 +103,12 @@ class Dashboard extends React.Component {
         // console.log("Token: " + result["access_token"])
         // this.props.handleToken(result["access_token"])
         // localStorage.setItem('token', result["access_token"]);
-        this.setState({
-          authenticated: true
-        })
+        if (result["discogsUsername"]){
+          this.setState({
+            discogsAuthenticated: true,
+            discogsUsername: result["discogsUsername"]
+          })
+        }
       }
     )
     event.preventDefault();

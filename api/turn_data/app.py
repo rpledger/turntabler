@@ -182,10 +182,11 @@ def login_discogs_user():
         user.access_token = encrypt(access_token)
         db.session.add(user)
         db.session.commit()
-        get_collection(discogs, user)
+        discogs_user = discogs.get_identity()
+        get_collection(discogs_user, user)
     except HTTPError as http_error:
         return jsonify({"msg": "Discogs authorization failed"}), 401
-    return jsonify({"msg": "Discogs authorization successful"}), 200
+    return jsonify({"discogsUsername": discogs_user.username}), 200
 
 
 @app.route('/api/discogs/refresh', methods=['GET'])
@@ -219,8 +220,8 @@ def get_discogs_user():
         return jsonify({"msg": "No Discogs credentials"}), 401
 
 
-def get_collection(discogs, user):
-    me = discogs.get_identity()
+def get_collection(me, user):
+    # me = discogs.get_identity()
     collections = me.collection_folders
     added_count = 0
     for release in collections[0].releases:
