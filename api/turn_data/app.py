@@ -163,13 +163,14 @@ def get_discogs_url():
     return jsonify({"url": url}), 200
 
 
-@app.route('/api/discogs/login', methods=['GET'])
+@app.route('/api/discogs/login', methods=['POST'])
 @jwt_required
 def login_discogs_user():
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
 
-    oauth_verifier = request.args.get('oauth_verifier')
+    data = request.get_json()
+    oauth_verifier = data["oauth_verifier"]  # request.args.get('oauth_verifier')
 
     token = decrypt(user.access_token)
     secret = decrypt(user.access_secret)
@@ -226,11 +227,16 @@ def get_collection(discogs, user):
         r = release.release
 
         if not any(rel.id == r.id for rel in user.releases):
-            release = Release(id=r.id,
-                              artist=r.artists[0].name,
-                              title=r.title,
-                              thumb=r.thumb
-                              )
+            stored_release = Release.query.filter_by(id=r.id).first()
+
+            if stored_release is None:
+                release = Release(id=r.id,
+                                  artist=r.artists[0].name,
+                                  title=r.title,
+                                  thumb=r.thumb
+                                  )
+            else:
+                release = stored_release
 
             user.releases.append(release)
             db.session.add(user)
