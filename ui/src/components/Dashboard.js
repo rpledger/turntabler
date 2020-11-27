@@ -9,6 +9,8 @@ import GridListTileBar from '@material-ui/core/GridListTileBar';
 import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Cookies from 'universal-cookie';
 import Container from '@material-ui/core/Container';
@@ -48,6 +50,7 @@ class Dashboard extends React.Component {
     super(props);
     this.state = {
       error: null,
+      loading: false,
       isLoaded: false,
       discogsAuthenticated: false,
       discogsUsername: '',
@@ -104,6 +107,9 @@ class Dashboard extends React.Component {
   }
 
   handleSubmit(event) {
+    this.setState({
+      loading: true
+    })
     fetch("/api/discogs/login", {
       method: 'post',
       headers: {
@@ -117,6 +123,8 @@ class Dashboard extends React.Component {
       (result) => {
         if (result["discogsUsername"]){
           this.setState({
+            isLoaded: true,
+            loading: false,
             discogsAuthenticated: true,
             discogsUsername: result["discogsUsername"]
           })
@@ -169,7 +177,12 @@ class Dashboard extends React.Component {
                 variant="contained"
                 color="primary"
               >
-                Authenticate
+                {!this.state.loading &&
+                  "Authenticate"
+                }
+                {this.state.loading &&
+                  <CircularProgress color="secondary" />
+                }
               </Button>
               </form>
           </div>
