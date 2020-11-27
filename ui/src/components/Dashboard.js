@@ -35,6 +35,7 @@ class Dashboard extends React.Component {
     super(props);
     this.state = {
       error: null,
+      isLoaded: false,
       discogsAuthenticated: false,
       discogsUsername: '',
     };
@@ -54,6 +55,7 @@ class Dashboard extends React.Component {
           this.setState({error: result["msg"]})
         } else if (result["discogsUsername"]) {
           this.setState({
+            isLoaded: true,
             discogsAuthenticated: true,
             discogsUsername: result["discogsUsername"]
           })
@@ -115,7 +117,11 @@ class Dashboard extends React.Component {
   }
 
   render(){
-    if (this.state.discogsAuthenticated){
+    if (this.state.error && this.state.error != "No Discogs credentials") {
+      return <Redirect to="/signIn" />;
+    } else if (!this.state.isLoaded && !this.state.error) {
+      return <div></div>;
+    } else if (this.state.discogsAuthenticated){
       return <div><h4>Hello, {this.state.discogsUsername}</h4></div>
     } else {
       return(
