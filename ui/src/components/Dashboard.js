@@ -94,9 +94,6 @@ class Dashboard extends React.Component {
           if (window.focus) {
             newWindow.focus();
           }
-          // window.location.assign(result["url"]);
-          // this.props.history.push(result["url"]);
-          // return <Redirect to={result["url"]}/>
         }
       }
     )

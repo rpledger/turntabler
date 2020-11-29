@@ -96,7 +96,7 @@ class SignIn extends React.Component {
   render() {
     const { classes } = this.props;
     if (this.state.authenticated) {
-      return <Redirect to="/albums"/>
+      return <Redirect to="/dashboard"/>
     }
     return (
       <Container component="main" maxWidth="xs">
@@ -108,7 +108,7 @@ class SignIn extends React.Component {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <form className={classes.form} noValidate action="/albums" onSubmit={this.handleSubmit}>
+          <form className={classes.form} noValidate action="/dashboard" onSubmit={this.handleSubmit}>
             <TextField
               variant="outlined"
               margin="normal"
