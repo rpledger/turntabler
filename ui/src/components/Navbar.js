@@ -109,7 +109,7 @@ function MenuAppBar() {
       onKeyDown={toggleDrawer(false)}
     >
       <List>
-        <ListItemLink button key="Dashboard" href="/">
+        <ListItemLink button key="Dashboard" href="/dashboard">
           <ListItemIcon><DashboardIcon /></ListItemIcon>
           <ListItemText primary="Dashboard" />
         </ListItemLink>

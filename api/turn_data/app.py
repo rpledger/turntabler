@@ -163,13 +163,14 @@ def get_discogs_url():
     return jsonify({"url": url}), 200
 
 
-@app.route('/api/discogs/login', methods=['GET'])
+@app.route('/api/discogs/login', methods=['POST'])
 @jwt_required
 def login_discogs_user():
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
 
-    oauth_verifier = request.args.get('oauth_verifier')
+    data = request.get_json()
+    oauth_verifier = data["oauth_verifier"]  # request.args.get('oauth_verifier')
 
     token = decrypt(user.access_token)
     secret = decrypt(user.access_secret)
@@ -181,15 +182,16 @@ def login_discogs_user():
         user.access_token = encrypt(access_token)
         db.session.add(user)
         db.session.commit()
-        get_collection(discogs, user)
+        discogs_user = discogs.get_identity()
+        get_collection(discogs_user, user)
     except HTTPError as http_error:
         return jsonify({"msg": "Discogs authorization failed"}), 401
-    return jsonify({"msg": "Discogs authorization successful"}), 200
+    return jsonify({"discogsUsername": discogs_user.username}), 200
 
 
-@app.route('/api/discogs/user', methods=['GET'])
+@app.route('/api/discogs/refresh', methods=['GET'])
 @jwt_required
-def get_discogs_user():
+def get_discogs_refresh():
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
 
@@ -202,19 +204,40 @@ def get_discogs_user():
     return jsonify({"msg": "Added " + str(added_count) + " releases to " + user.username}), 200
 
 
-def get_collection(discogs, user):
-    me = discogs.get_identity()
+@app.route('/api/discogs/user', methods=['GET'])
+@jwt_required
+def get_discogs_user():
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(username=current_user).first()
+
+    if user.access_token and user.access_secret:
+        token = decrypt(user.access_token)
+        secret = decrypt(user.access_secret)
+        discogs = Discogs(token=token, secret=secret)
+        discogs_user = discogs.get_identity()
+        return jsonify({"discogsUsername": discogs_user.username}), 200
+    else:
+        return jsonify({"msg": "No Discogs credentials"}), 401
+
+
+def get_collection(me, user):
+    # me = discogs.get_identity()
     collections = me.collection_folders
     added_count = 0
     for release in collections[0].releases:
         r = release.release
 
         if not any(rel.id == r.id for rel in user.releases):
-            release = Release(id=r.id,
-                              artist=r.artists[0].name,
-                              title=r.title,
-                              thumb=r.thumb
-                              )
+            stored_release = Release.query.filter_by(id=r.id).first()
+
+            if stored_release is None:
+                release = Release(id=r.id,
+                                  artist=r.artists[0].name,
+                                  title=r.title,
+                                  thumb=r.thumb
+                                  )
+            else:
+                release = stored_release
 
             user.releases.append(release)
             db.session.add(user)

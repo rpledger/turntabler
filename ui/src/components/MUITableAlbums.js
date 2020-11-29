@@ -83,9 +83,6 @@ class MUITableAlbums extends React.Component {
   componentDidMount() {
     fetch("/api/releases", {
       method: "get",
-      // headers: {
-      // 'Authorization': 'Bearer ' + localStorage.getItem("token")
-    // }
   })
     .then(res => res.json())
     .then(
@@ -105,7 +102,7 @@ class MUITableAlbums extends React.Component {
   render() {
     const { error, isLoaded, albumList } = this.state;
     if (error) {
-      return <Redirect to="/signIn" />; //<div>Error: {error.message}</div>;
+      return <Redirect to="/signIn" />;
     } else if (!isLoaded) {
       return <div></div>;
     } else {

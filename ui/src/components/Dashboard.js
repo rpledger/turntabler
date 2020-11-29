@@ -1,69 +1,209 @@
 // Dashboard.js
 import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
+import Button from '@material-ui/core/Button';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
+import CssBaseline from '@material-ui/core/CssBaseline';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
-import { makeStyles } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
+import { makeStyles, withStyles } from '@material-ui/core/styles';
+import Cookies from 'universal-cookie';
+import Container from '@material-ui/core/Container';
 
 
-var tileData = [
-  {
-    img: "https://img.discogs.com/SwnFq01J1XAXArAhfvgtG6EgkH0=/fit-in/300x300/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-986527-1293716829.jpeg.jpg",
-    title: "Emotionalism"
-  },
-  {
-    img: "https://img.discogs.com/7XGz7VuFH-dp80PqS_M-BLe7GGA=/fit-in/300x300/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-1963341-1262735484.jpeg.jpg",
-    title: "I and Love and You"
-  },
-  {
-    img: "https://img.discogs.com/7thNTBY7jzWL6Oa7QXwCssboU7k=/fit-in/300x300/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-2093811-1263645509.jpeg.jpg",
-    title: "The Second Gleam"
-  },
-  {
-    img: "https://img.discogs.com/7thNTBY7jzWL6Oa7QXwCssboU7k=/fit-in/300x300/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-2093811-1263645509.jpeg.jpg",
-    title: "The Second Gleam"
-  },
-  {
-    img: "https://img.discogs.com/7thNTBY7jzWL6Oa7QXwCssboU7k=/fit-in/300x300/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-2093811-1263645509.jpeg.jpg",
-    title: "The Second Gleam"
-  }
-]
+const cookies = new Cookies();
 
-const useStyles = makeStyles(theme => ({
-  root: {
+
+const useStyles = theme => ({
+  '@global': {
+    body: {
+      backgroundColor: theme.palette.common.white,
+    },
+  },
+  paper: {
+    marginTop: theme.spacing(8),
     display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    overflow: 'hidden',
-    backgroundColor: theme.palette.background.paper,
-    marginTop: theme.spacing(3)
+    flexDirection: 'column',
+    alignItems: 'center',
   },
-  gridList: {
-     width: 400
+  avatar: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main,
   },
-  title: {
-    flexGrow: 1,
+  form: {
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(1),
   },
-}));
+  submit: {
+    margin: theme.spacing(3, 0, 2),
+  },
+});
 
-function Dashboard() {
-  const classes = useStyles();
-   const { classes, currentUser, images, width } = this.props;
+class Dashboard extends React.Component {
 
-  let columns = width === 'xs' || width === 'sm'  ? 1 : 2;
+  constructor(props){
+    super(props);
+    this.state = {
+      error: null,
+      loading: false,
+      isLoaded: false,
+      discogsAuthenticated: false,
+      discogsUsername: '',
+    };
+    this.onClickDiscogsLogin = this.onClickDiscogsLogin.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+  }
 
+  componentDidMount() {
+    fetch("/api/discogs/user", {
+      method: "get",
+    })
+    .then(res => res.json())
+    .then(
+      (result) => {
+        if (result["msg"]) {
+          this.setState({error: result["msg"]})
+        } else if (result["discogsUsername"]) {
+          this.setState({
+            isLoaded: true,
+            discogsAuthenticated: true,
+            discogsUsername: result["discogsUsername"]
+          })
+        }
+      }
+    )
+  }
 
-  return (
-    <div className={classes.root}>
-      <GridList spacing={5} cellHeight={200} className={classes.gridList} cols={columns} >
-        {tileData.map(tile => (
-          <GridListTile key={tile.img}>
-            <img src={tile.img} alt={tile.title} />
-          </GridListTile>
-        ))}
-      </GridList>
-    </div>
-  );
+  onClickDiscogsLogin(event) {
+    fetch("/api/discogs/url", {
+      method: "get",
+    })
+    .then(res => res.json())
+    .then(
+      (result) => {
+        if (result["url"]) {
+          console.log(result["url"])
+          // return result["url"]
+          var newWindow = window.open(result["url"], 'name', 'height=600,width=450');
+          if (window.focus) {
+            newWindow.focus();
+          }
+        }
+      }
+    )
+  }
+
+  handleChange(event) {
+    this.setState({[event.target.name]: event.target.value});
+  }
+
+  handleSubmit(event) {
+    this.setState({
+      loading: true
+    })
+    fetch("/api/discogs/login", {
+      method: 'post',
+      headers: {
+        'X-Csrf-Token': cookies.get('csrf_access_token'),
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({"oauth_verifier": this.state.verificationCode})
+    }).then( res => res.json())
+    .then(
+      (result) => {
+        if (result["discogsUsername"]){
+          this.setState({
+            isLoaded: true,
+            loading: false,
+            discogsAuthenticated: true,
+            discogsUsername: result["discogsUsername"]
+          })
+        }
+      }
+    )
+    event.preventDefault();
+  }
+
+  render(){
+    const { classes } = this.props;
+    if (this.state.error && this.state.error != "No Discogs credentials") {
+      return <Redirect to="/signIn" />;
+    } else if (!this.state.isLoaded && !this.state.error) {
+      return <div></div>;
+    } else if (this.state.discogsAuthenticated){
+      return (
+        <Container component="main" maxWidth="s">
+          <div className={classes.paper}>
+            <Typography component="h1" variant="h4">
+              Hello, {this.state.discogsUsername}
+            </Typography>
+          </div>
+        </Container>
+      )
+    } else {
+      return(
+        <Container component="main" maxWidth="xs">
+          <CssBaseline />
+          <div className={classes.paper}>
+            <Button variant="contained" color="secondary" onClick={this.onClickDiscogsLogin}>
+              Connect Your Discogs
+            </Button>
+            <form noValidate action="/dasboard" onSubmit={this.handleSubmit}>
+              <TextField
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                id="verificationCode"
+                label="Verification Code"
+                name="verificationCode"
+                autoComplete="verificationCode"
+                autoFocus
+                onChange={this.handleChange}
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+              >
+                {!this.state.loading &&
+                  "Authenticate"
+                }
+                {this.state.loading &&
+                  <CircularProgress color="secondary" />
+                }
+              </Button>
+              </form>
+          </div>
+        </Container>
+      )
+    }
+
+  }
+
+  // render() {
+  //   const { error, discogsAuthenticated, discogsUsername } = this.state;
+  //   if (error) {
+  //     return <Redirect to="/signIn" />; //<div>Error: {error.message}</div>;
+  //   } else if (!discogsAuthenticated) {
+  //     return <div>Not Authenticated</div>;
+  //   } else {
+  //     return(
+  //       <div>
+  //       Hello, {discogsUsername}
+  //       </div>
+  //     )
+  //   }
+  // }
 }
 
-export default Dashboard;
+// export default Dashboard;
+export default withStyles(useStyles, { withTheme: true })(Dashboard);
